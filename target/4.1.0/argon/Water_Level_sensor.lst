@@ -183,31 +183,16 @@ void __cxa_guard_release (__guard *g) {*(char *)g = 1;};
 	...
 
 000b40b0 <setup>:
-int sensorValue;                                      // The integer value (between 0 and 4095) that we read from the sensor
-
-//--  Other declarations  --//
-
-
-void setup() {
    b40b0:	b510      	push	{r4, lr}
-
-    Wire.begin();
-                               
-    pinMode(XSHUT, OUTPUT);                                                                          // Set to LOW when using SYSTEM MODE SEMI_AUTOMATIC 
    b40b2:	4c07      	ldr	r4, [pc, #28]	; (b40d0 <setup+0x20>)
-    Wire.begin();
    b40b4:	f002 f9aa 	bl	b640c <_Z19__fetch_global_Wirev>
    b40b8:	f001 fb96 	bl	b57e8 <_ZN7TwoWire5beginEv>
-    pinMode(XSHUT, OUTPUT);                                                                          // Set to LOW when using SYSTEM MODE SEMI_AUTOMATIC 
    b40bc:	8820      	ldrh	r0, [r4, #0]
    b40be:	2101      	movs	r1, #1
    b40c0:	f002 f95e 	bl	b6380 <pinMode>
-    digitalWrite(XSHUT, LOW);
    b40c4:	8820      	ldrh	r0, [r4, #0]
    b40c6:	2100      	movs	r1, #0
-}
    b40c8:	e8bd 4010 	ldmia.w	sp!, {r4, lr}
-    digitalWrite(XSHUT, LOW);
    b40cc:	f002 b969 	b.w	b63a2 <digitalWrite>
    b40d0:	2003e604 	.word	0x2003e604
 
@@ -252,11 +237,6 @@ void setup() {
    b40fe:	bd38      	pop	{r3, r4, r5, pc}
 
 000b4100 <_GLOBAL__sub_I_SystemMode>:
-    ToF1();
-    delay(5000);
-
-    Sleep();                    // After readings system sleeps for 10 minutes
-
    b4100:	b538      	push	{r3, r4, r5, lr}
 } // namespace particle
 
@@ -293,12 +273,10 @@ public:
         set_system_mode(mode);
    b4114:	2002      	movs	r0, #2
    b4116:	f000 fee1 	bl	b4edc <set_system_mode>
-SYSTEM_THREAD(ENABLED);                                 // DANGER!!! //
    b411a:	4628      	mov	r0, r5
    b411c:	4621      	mov	r1, r4
    b411e:	f000 feed 	bl	b4efc <system_thread_set_state>
    b4122:	e8bd 4038 	ldmia.w	sp!, {r3, r4, r5, lr}
-VL53L1X sensor;
    b4126:	4804      	ldr	r0, [pc, #16]	; (b4138 <_GLOBAL__sub_I_SystemMode+0x38>)
    b4128:	f000 b9a6 	b.w	b4478 <_ZN7VL53L1XC1Ev>
    b412c:	2003e680 	.word	0x2003e680
@@ -307,23 +285,15 @@ VL53L1X sensor;
    b4138:	2003e688 	.word	0x2003e688
 
 000b413c <_Z4ToF1v>:
-void ToF1() {
    b413c:	b570      	push	{r4, r5, r6, lr}
    b413e:	ed2d 8b02 	vpush	{d8}
-    digitalWrite(XSHUT, HIGH);                                      // Enable ToF
    b4142:	4d79      	ldr	r5, [pc, #484]	; (b4328 <_Z4ToF1v+0x1ec>)
-    int value_prev = 0;                                             // The integaer value of the "prevous" sample.
    b4144:	ed9f 8a79 	vldr	s16, [pc, #484]	; b432c <_Z4ToF1v+0x1f0>
-    digitalWrite(XSHUT, HIGH);                                      // Enable ToF
    b4148:	8828      	ldrh	r0, [r5, #0]
-        int distance = sensor.read();                                                   //Get the result of the measurement from the sensor
    b414a:	4e79      	ldr	r6, [pc, #484]	; (b4330 <_Z4ToF1v+0x1f4>)
-void ToF1() {
    b414c:	b08c      	sub	sp, #48	; 0x30
-    digitalWrite(XSHUT, HIGH);                                      // Enable ToF
    b414e:	2101      	movs	r1, #1
    b4150:	f002 f927 	bl	b63a2 <digitalWrite>
-    Wire.setClock(400000);                                          // use 400 kHz I2C     
    b4154:	f002 f95a 	bl	b640c <_Z19__fetch_global_Wirev>
 
 public:
@@ -333,49 +303,33 @@ public:
 	  setSpeed(speed);
    b4158:	4976      	ldr	r1, [pc, #472]	; (b4334 <_Z4ToF1v+0x1f8>)
    b415a:	f001 fb41 	bl	b57e0 <_ZN7TwoWire8setSpeedEm>
-    sensor.init(0x29);
    b415e:	2101      	movs	r1, #1
    b4160:	4873      	ldr	r0, [pc, #460]	; (b4330 <_Z4ToF1v+0x1f4>)
    b4162:	f000 fcb6 	bl	b4ad2 <_ZN7VL53L1X4initEb>
-    sensor.setDistanceMode(VL53L1X::Long);
    b4166:	2102      	movs	r1, #2
    b4168:	4871      	ldr	r0, [pc, #452]	; (b4330 <_Z4ToF1v+0x1f4>)
    b416a:	f000 fc39 	bl	b49e0 <_ZN7VL53L1X15setDistanceModeENS_12DistanceModeE>
-    sensor.setMeasurementTimingBudget(50000);
    b416e:	f24c 3150 	movw	r1, #50000	; 0xc350
    b4172:	486f      	ldr	r0, [pc, #444]	; (b4330 <_Z4ToF1v+0x1f4>)
    b4174:	f000 fbb6 	bl	b48e4 <_ZN7VL53L1X26setMeasurementTimingBudgetEm>
-    sensor.startContinuous(50);                                                         // timing budget -- 50ms default
    b4178:	486d      	ldr	r0, [pc, #436]	; (b4330 <_Z4ToF1v+0x1f4>)
    b417a:	2132      	movs	r1, #50	; 0x32
    b417c:	f000 fa3d 	bl	b45fa <_ZN7VL53L1X15startContinuousEm>
    b4180:	2464      	movs	r4, #100	; 0x64
-        int distance = sensor.read();                                                   //Get the result of the measurement from the sensor
    b4182:	2101      	movs	r1, #1
    b4184:	4630      	mov	r0, r6
    b4186:	f000 fb59 	bl	b483c <_ZN7VL53L1X4readEb>
-        val_now = float(distance);
    b418a:	ee07 0a90 	vmov	s15, r0
-        val_prev = float(value_prev);
    b418e:	eeb8 8ac8 	vcvt.f32.s32	s16, s16
-        val_now = float(distance);
    b4192:	eef8 7ae7 	vcvt.f32.s32	s15, s15
-for (int k=0; k<numSamples; k++) {
    b4196:	3c01      	subs	r4, #1
-        accum = (val_now + val_prev);
    b4198:	ee78 7a27 	vadd.f32	s15, s16, s15
-        value_prev = accum;
    b419c:	eebd 8ae7 	vcvt.s32.f32	s16, s15
-for (int k=0; k<numSamples; k++) {
    b41a0:	d1ef      	bne.n	b4182 <_Z4ToF1v+0x46>
-        avgValue = accum / numSamples;
    b41a2:	ed9f 7a65 	vldr	s14, [pc, #404]	; b4338 <_Z4ToF1v+0x1fc>
-if (avgValue <=(L1_t) && avgValue >=(L1_b)) {            
    b41a6:	4b65      	ldr	r3, [pc, #404]	; (b433c <_Z4ToF1v+0x200>)
    b41a8:	4c65      	ldr	r4, [pc, #404]	; (b4340 <_Z4ToF1v+0x204>)
-        avgValue = accum / numSamples;
    b41aa:	ee87 8a87 	vdiv.f32	s16, s15, s14
-if (avgValue <=(L1_t) && avgValue >=(L1_b)) {            
    b41ae:	edd3 7a00 	vldr	s15, [r3]
    b41b2:	eef8 7ae7 	vcvt.f32.s32	s15, s15
    b41b6:	eef4 7ac8 	vcmpe.f32	s15, s16
@@ -387,22 +341,14 @@ if (avgValue <=(L1_t) && avgValue >=(L1_b)) {
    b41ca:	eef4 7ac8 	vcmpe.f32	s15, s16
    b41ce:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
    b41d2:	d820      	bhi.n	b4216 <_Z4ToF1v+0xda>
-        tof1_level = 1;                               
    b41d4:	2301      	movs	r3, #1
-    delay(50);
    b41d6:	2032      	movs	r0, #50	; 0x32
-    } else { tof1_level = 4; 
    b41d8:	6023      	str	r3, [r4, #0]
-    delay(50);
    b41da:	f000 ff8d 	bl	b50f8 <delay>
-    digitalWrite(XSHUT, LOW);                                      // Disable ToF1 
    b41de:	8828      	ldrh	r0, [r5, #0]
-if (tof1_level != level) {                                          // only send data if Level has shifted
    b41e0:	4d59      	ldr	r5, [pc, #356]	; (b4348 <_Z4ToF1v+0x20c>)
-    digitalWrite(XSHUT, LOW);                                      // Disable ToF1 
    b41e2:	2100      	movs	r1, #0
    b41e4:	f002 f8dd 	bl	b63a2 <digitalWrite>
-if (tof1_level != level) {                                          // only send data if Level has shifted
    b41e8:	6822      	ldr	r2, [r4, #0]
    b41ea:	682b      	ldr	r3, [r5, #0]
    b41ec:	429a      	cmp	r2, r3
@@ -414,7 +360,6 @@ if (tof1_level != level) {                                          // only send
 
     static bool connected(void) { return spark_cloud_flag_connected(); }
    b41f2:	f000 fec9 	bl	b4f88 <spark_cloud_flag_connected>
-    if (Particle.connected() == false) {
    b41f6:	4603      	mov	r3, r0
    b41f8:	2800      	cmp	r0, #0
    b41fa:	d147      	bne.n	b428c <_Z4ToF1v+0x150>
@@ -435,7 +380,6 @@ if (tof1_level != level) {                                          // only send
    b4200:	4601      	mov	r1, r0
    b4202:	6870      	ldr	r0, [r6, #4]
    b4204:	f000 ff00 	bl	b5008 <network_on>
-        waitUntil(WiFi.isOn);
    b4208:	4630      	mov	r0, r6
    b420a:	f001 fbcb 	bl	b59a4 <_ZN5spark12NetworkClass4isOnEv>
 
@@ -449,46 +393,36 @@ if (tof1_level != level) {                                          // only send
    b4210:	f000 feaa 	bl	b4f68 <spark_process>
         while (_while() && !_condition()) {
    b4214:	e7f8      	b.n	b4208 <_Z4ToF1v+0xcc>
-        (avgValue <=(L2_t) && avgValue >=(L2_b)) {
    b4216:	4b4e      	ldr	r3, [pc, #312]	; (b4350 <_Z4ToF1v+0x214>)
    b4218:	edd3 7a00 	vldr	s15, [r3]
    b421c:	eef8 7ae7 	vcvt.f32.s32	s15, s15
-    } else if                                       
    b4220:	eef4 7ac8 	vcmpe.f32	s15, s16
    b4224:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
    b4228:	db0b      	blt.n	b4242 <_Z4ToF1v+0x106>
-        (avgValue <=(L2_t) && avgValue >=(L2_b)) {
    b422a:	4b4a      	ldr	r3, [pc, #296]	; (b4354 <_Z4ToF1v+0x218>)
    b422c:	edd3 7a00 	vldr	s15, [r3]
    b4230:	eef8 7ae7 	vcvt.f32.s32	s15, s15
    b4234:	eef4 7ac8 	vcmpe.f32	s15, s16
    b4238:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
    b423c:	d801      	bhi.n	b4242 <_Z4ToF1v+0x106>
-        tof1_level = 2;
    b423e:	2302      	movs	r3, #2
    b4240:	e7c9      	b.n	b41d6 <_Z4ToF1v+0x9a>
-        (avgValue <=(L3_t) && avgValue >=(L3_b)) {
    b4242:	4b45      	ldr	r3, [pc, #276]	; (b4358 <_Z4ToF1v+0x21c>)
    b4244:	edd3 7a00 	vldr	s15, [r3]
    b4248:	eef8 7ae7 	vcvt.f32.s32	s15, s15
-    } else if                                       
    b424c:	eef4 7ac8 	vcmpe.f32	s15, s16
    b4250:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
    b4254:	db0b      	blt.n	b426e <_Z4ToF1v+0x132>
-        (avgValue <=(L3_t) && avgValue >=(L3_b)) {
    b4256:	4b41      	ldr	r3, [pc, #260]	; (b435c <_Z4ToF1v+0x220>)
    b4258:	edd3 7a00 	vldr	s15, [r3]
    b425c:	eef8 7ae7 	vcvt.f32.s32	s15, s15
    b4260:	eef4 7ac8 	vcmpe.f32	s15, s16
    b4264:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
    b4268:	d801      	bhi.n	b426e <_Z4ToF1v+0x132>
-        tof1_level = 3;
    b426a:	2303      	movs	r3, #3
    b426c:	e7b3      	b.n	b41d6 <_Z4ToF1v+0x9a>
-    } else { tof1_level = 4; 
    b426e:	2304      	movs	r3, #4
    b4270:	e7b1      	b.n	b41d6 <_Z4ToF1v+0x9a>
-        waitUntil(WiFi.isOn);
    b4272:	4836      	ldr	r0, [pc, #216]	; (b434c <_Z4ToF1v+0x210>)
    b4274:	f001 fb96 	bl	b59a4 <_ZN5spark12NetworkClass4isOnEv>
     static bool disconnected(void) { return !connected(); }
@@ -504,7 +438,6 @@ if (tof1_level != level) {                                          // only send
    b4286:	e7f9      	b.n	b427c <_Z4ToF1v+0x140>
    b4288:	f000 fe7e 	bl	b4f88 <spark_cloud_flag_connected>
    b428c:	f000 fe7c 	bl	b4f88 <spark_cloud_flag_connected>
-    if (Particle.connected() == true) {
    b4290:	2800      	cmp	r0, #0
    b4292:	d03f      	beq.n	b4314 <_Z4ToF1v+0x1d8>
 
@@ -517,7 +450,6 @@ public:
    b4296:	4e33      	ldr	r6, [pc, #204]	; (b4364 <_Z4ToF1v+0x228>)
    b4298:	a808      	add	r0, sp, #32
    b429a:	f001 fd1a 	bl	b5cd2 <_ZN6StringC1EPK19__FlashStringHelper>
-        Particle.publish("Water Level: " + String(tof1_level), PRIVATE);
    b429e:	220a      	movs	r2, #10
    b42a0:	6821      	ldr	r1, [r4, #0]
    b42a2:	a804      	add	r0, sp, #16
@@ -551,7 +483,6 @@ class StringSumHelper : public String
    b42d4:	4924      	ldr	r1, [pc, #144]	; (b4368 <_Z4ToF1v+0x22c>)
    b42d6:	a808      	add	r0, sp, #32
    b42d8:	f001 fcfb 	bl	b5cd2 <_ZN6StringC1EPK19__FlashStringHelper>
-        Particle.publish("Level Distance: " + String(avgValue), PRIVATE);
    b42dc:	eeb0 0a48 	vmov.f32	s0, s16
    b42e0:	2106      	movs	r1, #6
    b42e2:	a804      	add	r0, sp, #16
@@ -574,16 +505,12 @@ class StringSumHelper : public String
 class StringSumHelper : public String
    b430e:	a808      	add	r0, sp, #32
    b4310:	f001 fc94 	bl	b5c3c <_ZN6StringD1Ev>
-    level = tof1_level;
    b4314:	6823      	ldr	r3, [r4, #0]
    b4316:	602b      	str	r3, [r5, #0]
-    delay(50);                     
    b4318:	2032      	movs	r0, #50	; 0x32
-}
    b431a:	b00c      	add	sp, #48	; 0x30
    b431c:	ecbd 8b02 	vpop	{d8}
    b4320:	e8bd 4070 	ldmia.w	sp!, {r4, r5, r6, lr}
-    delay(50);                     
    b4324:	f000 bee8 	b.w	b50f8 <delay>
    b4328:	2003e604 	.word	0x2003e604
    b432c:	00000000 	.word	0x00000000
@@ -604,7 +531,6 @@ class StringSumHelper : public String
    b4368:	000b72ee 	.word	0x000b72ee
 
 000b436c <_Z5Sleepv>:
-void Sleep() {
    b436c:	b530      	push	{r4, r5, lr}
 inline bool CloudDisconnectOptions::isGracefulSet() const {
     return (flags_ & SPARK_CLOUD_DISCONNECT_OPTION_GRACEFUL);
@@ -616,7 +542,6 @@ inline CloudDisconnectOptions& CloudDisconnectOptions::timeout(system_tick_t tim
    b4372:	b08b      	sub	sp, #44	; 0x2c
    b4374:	2203      	movs	r2, #3
    b4376:	e9cd 2304 	strd	r2, r3, [sp, #16]
-    Particle.disconnect(CloudDisconnectOptions().graceful(true).timeout(5000));       // Use only in SEMI_AUTOMATIC mode
    b437a:	a804      	add	r0, sp, #16
         bool clearSession) :
    b437c:	2301      	movs	r3, #1
@@ -641,7 +566,6 @@ inline CloudDisconnectOptions& CloudDisconnectOptions::timeout(system_tick_t tim
    b439e:	4622      	mov	r2, r4
    b43a0:	4621      	mov	r1, r4
    b43a2:	f000 fe39 	bl	b5018 <network_off>
-    waitUntil(WiFi.isOff);
    b43a6:	4628      	mov	r0, r5
    b43a8:	f001 fb00 	bl	b59ac <_ZN5spark12NetworkClass5isOffEv>
    b43ac:	b910      	cbnz	r0, b43b4 <_Z5Sleepv+0x48>
@@ -651,7 +575,6 @@ inline CloudDisconnectOptions& CloudDisconnectOptions::timeout(system_tick_t tim
    b43b2:	e7f8      	b.n	b43a6 <_Z5Sleepv+0x3a>
    b43b4:	481f      	ldr	r0, [pc, #124]	; (b4434 <_Z5Sleepv+0xc8>)
    b43b6:	f001 faf9 	bl	b59ac <_ZN5spark12NetworkClass5isOffEv>
-    delay(50);
    b43ba:	2032      	movs	r0, #50	; 0x32
    b43bc:	f000 fe9c 	bl	b50f8 <delay>
 ENABLE_ENUM_CLASS_BITWISE(SystemSleepNetworkFlag);
@@ -724,7 +647,6 @@ public:
    b4406:	60e3      	str	r3, [r4, #12]
             config_.wakeup_sources = reinterpret_cast<hal_wakeup_source_base_t*>(wakeupSource);
    b4408:	9408      	str	r4, [sp, #32]
-System.sleep(config);
    b440a:	a801      	add	r0, sp, #4
    b440c:	a904      	add	r1, sp, #16
    b440e:	f001 fd05 	bl	b5e1c <_ZN11SystemClass5sleepERKN8particle24SystemSleepConfigurationE>
@@ -750,7 +672,6 @@ System.sleep(config);
    b442a:	f88d 0024 	strb.w	r0, [sp, #36]	; 0x24
                 return *this;
    b442e:	e7ec      	b.n	b440a <_Z5Sleepv+0x9e>
-}
    b4430:	b00b      	add	sp, #44	; 0x2c
    b4432:	bd30      	pop	{r4, r5, pc}
    b4434:	2003e70c 	.word	0x2003e70c
@@ -759,24 +680,14 @@ System.sleep(config);
    b4440:	0001d4c0 	.word	0x0001d4c0
 
 000b4444 <loop>:
-void loop() {
    b4444:	b508      	push	{r3, lr}
-    ToF1();
    b4446:	f7ff fe79 	bl	b413c <_Z4ToF1v>
-    delay(5000);
    b444a:	f241 3088 	movw	r0, #5000	; 0x1388
    b444e:	f000 fe53 	bl	b50f8 <delay>
    b4452:	e8bd 4008 	ldmia.w	sp!, {r3, lr}
-    Sleep();                    // After readings system sleeps for 10 minutes
    b4456:	f7ff bf89 	b.w	b436c <_Z5Sleepv>
 
 000b445a <_ZN7VL53L1X19checkTimeoutExpiredEv>:
-
-    // Record the current time to check an upcoming timeout against
-    void startTimeout() { timeout_start_ms = millis(); }
-
-    // Check if timeout is enabled (set to nonzero value) and has expired
-    bool checkTimeoutExpired() {return (io_timeout > 0) && ((uint16_t)(millis() - timeout_start_ms) > io_timeout); }
    b445a:	b510      	push	{r4, lr}
    b445c:	4604      	mov	r4, r0
    b445e:	8bc0      	ldrh	r0, [r0, #30]
@@ -799,23 +710,9 @@ inline system_tick_t millis(void) { return HAL_Timer_Get_Milli_Seconds(); }
    b4476:	bd10      	pop	{r4, pc}
 
 000b4478 <_ZN7VL53L1XC1Ev>:
-
-#include "../lib/tof/src/VL53L1X.h"
-
-// Constructors ////////////////////////////////////////////////////////////////
-
-VL53L1X::VL53L1X()
    b4478:	b510      	push	{r4, lr}
    b447a:	4604      	mov	r4, r0
-#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_TWOWIRE)
-  : bus(&Wire)
    b447c:	f001 ffc6 	bl	b640c <_Z19__fetch_global_Wirev>
-  , io_timeout(0) // no timeout
-  , did_timeout(false)
-  , calibrated(false)
-  , saved_vhv_init(0)
-  , saved_vhv_timeout(0)
-  , distance_mode(Unknown)
    b4480:	2329      	movs	r3, #41	; 0x29
    b4482:	7723      	strb	r3, [r4, #28]
    b4484:	2300      	movs	r3, #0
@@ -824,421 +721,275 @@ VL53L1X::VL53L1X()
    b448c:	f04f 7340 	mov.w	r3, #50331648	; 0x3000000
    b4490:	61a0      	str	r0, [r4, #24]
    b4492:	62a3      	str	r3, [r4, #40]	; 0x28
-{
-}
    b4494:	4620      	mov	r0, r4
    b4496:	bd10      	pop	{r4, pc}
 
 000b4498 <_ZN7VL53L1X8writeRegEth>:
-  return true;
-}
-
-// Write an 8-bit register
-void VL53L1X::writeReg(uint16_t reg, uint8_t value)
-{
    b4498:	b570      	push	{r4, r5, r6, lr}
    b449a:	4604      	mov	r4, r0
    b449c:	460d      	mov	r5, r1
-  bus->beginTransmission(address);
    b449e:	7f01      	ldrb	r1, [r0, #28]
    b44a0:	6980      	ldr	r0, [r0, #24]
-{
    b44a2:	4616      	mov	r6, r2
-  bus->beginTransmission(address);
    b44a4:	f001 f9d2 	bl	b584c <_ZN7TwoWire17beginTransmissionEh>
-  bus->write((uint8_t)(reg >> 8)); // reg high byte
    b44a8:	69a0      	ldr	r0, [r4, #24]
    b44aa:	6803      	ldr	r3, [r0, #0]
    b44ac:	0a29      	lsrs	r1, r5, #8
    b44ae:	689b      	ldr	r3, [r3, #8]
    b44b0:	4798      	blx	r3
-  bus->write((uint8_t)(reg));      // reg low byte
    b44b2:	69a0      	ldr	r0, [r4, #24]
    b44b4:	6803      	ldr	r3, [r0, #0]
    b44b6:	b2e9      	uxtb	r1, r5
    b44b8:	689b      	ldr	r3, [r3, #8]
    b44ba:	4798      	blx	r3
-  bus->write(value);
    b44bc:	69a0      	ldr	r0, [r4, #24]
    b44be:	6803      	ldr	r3, [r0, #0]
    b44c0:	4631      	mov	r1, r6
    b44c2:	689b      	ldr	r3, [r3, #8]
    b44c4:	4798      	blx	r3
-  last_status = bus->endTransmission();
    b44c6:	69a0      	ldr	r0, [r4, #24]
    b44c8:	f001 f9c8 	bl	b585c <_ZN7TwoWire15endTransmissionEv>
    b44cc:	7320      	strb	r0, [r4, #12]
-}
    b44ce:	bd70      	pop	{r4, r5, r6, pc}
 
 000b44d0 <_ZN7VL53L1X13writeReg16BitEtt>:
-
-// Write a 16-bit register
-void VL53L1X::writeReg16Bit(uint16_t reg, uint16_t value)
-{
    b44d0:	b570      	push	{r4, r5, r6, lr}
    b44d2:	4604      	mov	r4, r0
    b44d4:	460e      	mov	r6, r1
-  bus->beginTransmission(address);
    b44d6:	7f01      	ldrb	r1, [r0, #28]
    b44d8:	6980      	ldr	r0, [r0, #24]
-{
    b44da:	4615      	mov	r5, r2
-  bus->beginTransmission(address);
    b44dc:	f001 f9b6 	bl	b584c <_ZN7TwoWire17beginTransmissionEh>
-  bus->write((uint8_t)(reg >> 8)); // reg high byte
    b44e0:	69a0      	ldr	r0, [r4, #24]
    b44e2:	6803      	ldr	r3, [r0, #0]
    b44e4:	0a31      	lsrs	r1, r6, #8
    b44e6:	689b      	ldr	r3, [r3, #8]
    b44e8:	4798      	blx	r3
-  bus->write((uint8_t)(reg));      // reg low byte
    b44ea:	69a0      	ldr	r0, [r4, #24]
    b44ec:	6803      	ldr	r3, [r0, #0]
    b44ee:	b2f1      	uxtb	r1, r6
    b44f0:	689b      	ldr	r3, [r3, #8]
    b44f2:	4798      	blx	r3
-  bus->write((uint8_t)(value >> 8)); // value high byte
    b44f4:	69a0      	ldr	r0, [r4, #24]
    b44f6:	6803      	ldr	r3, [r0, #0]
    b44f8:	0a29      	lsrs	r1, r5, #8
    b44fa:	689b      	ldr	r3, [r3, #8]
    b44fc:	4798      	blx	r3
-  bus->write((uint8_t)(value));      // value low byte
    b44fe:	69a0      	ldr	r0, [r4, #24]
    b4500:	6803      	ldr	r3, [r0, #0]
    b4502:	b2e9      	uxtb	r1, r5
    b4504:	689b      	ldr	r3, [r3, #8]
    b4506:	4798      	blx	r3
-  last_status = bus->endTransmission();
    b4508:	69a0      	ldr	r0, [r4, #24]
    b450a:	f001 f9a7 	bl	b585c <_ZN7TwoWire15endTransmissionEv>
    b450e:	7320      	strb	r0, [r4, #12]
-}
    b4510:	bd70      	pop	{r4, r5, r6, pc}
 
 000b4512 <_ZN7VL53L1X13writeReg32BitEtm>:
-
-// Write a 32-bit register
-void VL53L1X::writeReg32Bit(uint16_t reg, uint32_t value)
-{
    b4512:	b570      	push	{r4, r5, r6, lr}
    b4514:	4604      	mov	r4, r0
    b4516:	460e      	mov	r6, r1
-  bus->beginTransmission(address);
    b4518:	7f01      	ldrb	r1, [r0, #28]
    b451a:	6980      	ldr	r0, [r0, #24]
-{
    b451c:	4615      	mov	r5, r2
-  bus->beginTransmission(address);
    b451e:	f001 f995 	bl	b584c <_ZN7TwoWire17beginTransmissionEh>
-  bus->write((uint8_t)(reg >> 8)); // reg high byte
    b4522:	69a0      	ldr	r0, [r4, #24]
    b4524:	6803      	ldr	r3, [r0, #0]
    b4526:	0a31      	lsrs	r1, r6, #8
    b4528:	689b      	ldr	r3, [r3, #8]
    b452a:	4798      	blx	r3
-  bus->write((uint8_t)(reg));      // reg low byte
    b452c:	69a0      	ldr	r0, [r4, #24]
    b452e:	6803      	ldr	r3, [r0, #0]
    b4530:	b2f1      	uxtb	r1, r6
    b4532:	689b      	ldr	r3, [r3, #8]
    b4534:	4798      	blx	r3
-  bus->write((uint8_t)(value >> 24)); // value highest byte
    b4536:	69a0      	ldr	r0, [r4, #24]
    b4538:	6803      	ldr	r3, [r0, #0]
    b453a:	0e29      	lsrs	r1, r5, #24
    b453c:	689b      	ldr	r3, [r3, #8]
    b453e:	4798      	blx	r3
-  bus->write((uint8_t)(value >> 16));
    b4540:	69a0      	ldr	r0, [r4, #24]
    b4542:	6803      	ldr	r3, [r0, #0]
    b4544:	f3c5 4107 	ubfx	r1, r5, #16, #8
    b4548:	689b      	ldr	r3, [r3, #8]
    b454a:	4798      	blx	r3
-  bus->write((uint8_t)(value >>  8));
    b454c:	69a0      	ldr	r0, [r4, #24]
    b454e:	6803      	ldr	r3, [r0, #0]
    b4550:	f3c5 2107 	ubfx	r1, r5, #8, #8
    b4554:	689b      	ldr	r3, [r3, #8]
    b4556:	4798      	blx	r3
-  bus->write((uint8_t)(value));       // value lowest byte
    b4558:	69a0      	ldr	r0, [r4, #24]
    b455a:	6803      	ldr	r3, [r0, #0]
    b455c:	b2e9      	uxtb	r1, r5
    b455e:	689b      	ldr	r3, [r3, #8]
    b4560:	4798      	blx	r3
-  last_status = bus->endTransmission();
    b4562:	69a0      	ldr	r0, [r4, #24]
    b4564:	f001 f97a 	bl	b585c <_ZN7TwoWire15endTransmissionEv>
    b4568:	7320      	strb	r0, [r4, #12]
-}
    b456a:	bd70      	pop	{r4, r5, r6, pc}
 
 000b456c <_ZN7VL53L1X7readRegENS_7regAddrE>:
-
-// Read an 8-bit register
-uint8_t VL53L1X::readReg(regAddr reg)
-{
    b456c:	b538      	push	{r3, r4, r5, lr}
    b456e:	4604      	mov	r4, r0
    b4570:	460d      	mov	r5, r1
-  uint8_t value;
-
-  bus->beginTransmission(address);
    b4572:	7f01      	ldrb	r1, [r0, #28]
    b4574:	6980      	ldr	r0, [r0, #24]
    b4576:	f001 f969 	bl	b584c <_ZN7TwoWire17beginTransmissionEh>
-  bus->write((uint8_t)(reg >> 8)); // reg high byte
    b457a:	69a0      	ldr	r0, [r4, #24]
    b457c:	6803      	ldr	r3, [r0, #0]
    b457e:	0a29      	lsrs	r1, r5, #8
    b4580:	689b      	ldr	r3, [r3, #8]
    b4582:	4798      	blx	r3
-  bus->write((uint8_t)(reg));      // reg low byte
    b4584:	69a0      	ldr	r0, [r4, #24]
    b4586:	6803      	ldr	r3, [r0, #0]
    b4588:	b2e9      	uxtb	r1, r5
    b458a:	689b      	ldr	r3, [r3, #8]
    b458c:	4798      	blx	r3
-  last_status = bus->endTransmission();
    b458e:	69a0      	ldr	r0, [r4, #24]
    b4590:	f001 f964 	bl	b585c <_ZN7TwoWire15endTransmissionEv>
-
-  bus->requestFrom(address, (uint8_t)1);
    b4594:	7f21      	ldrb	r1, [r4, #28]
-  last_status = bus->endTransmission();
    b4596:	7320      	strb	r0, [r4, #12]
-  bus->requestFrom(address, (uint8_t)1);
    b4598:	2201      	movs	r2, #1
    b459a:	69a0      	ldr	r0, [r4, #24]
    b459c:	f001 f953 	bl	b5846 <_ZN7TwoWire11requestFromEhj>
-  value = bus->read();
    b45a0:	69a0      	ldr	r0, [r4, #24]
    b45a2:	6803      	ldr	r3, [r0, #0]
    b45a4:	695b      	ldr	r3, [r3, #20]
    b45a6:	4798      	blx	r3
-
-  return value;
-}
    b45a8:	b2c0      	uxtb	r0, r0
    b45aa:	bd38      	pop	{r3, r4, r5, pc}
 
 000b45ac <_ZN7VL53L1X12readReg16BitEt>:
-
-// Read a 16-bit register
-uint16_t VL53L1X::readReg16Bit(uint16_t reg)
-{
    b45ac:	b538      	push	{r3, r4, r5, lr}
    b45ae:	4604      	mov	r4, r0
    b45b0:	460d      	mov	r5, r1
-  uint16_t value;
-
-  bus->beginTransmission(address);
    b45b2:	7f01      	ldrb	r1, [r0, #28]
    b45b4:	6980      	ldr	r0, [r0, #24]
    b45b6:	f001 f949 	bl	b584c <_ZN7TwoWire17beginTransmissionEh>
-  bus->write((uint8_t)(reg >> 8)); // reg high byte
    b45ba:	69a0      	ldr	r0, [r4, #24]
    b45bc:	6803      	ldr	r3, [r0, #0]
    b45be:	0a29      	lsrs	r1, r5, #8
    b45c0:	689b      	ldr	r3, [r3, #8]
    b45c2:	4798      	blx	r3
-  bus->write((uint8_t)(reg));      // reg low byte
    b45c4:	69a0      	ldr	r0, [r4, #24]
    b45c6:	6803      	ldr	r3, [r0, #0]
    b45c8:	b2e9      	uxtb	r1, r5
    b45ca:	689b      	ldr	r3, [r3, #8]
    b45cc:	4798      	blx	r3
-  last_status = bus->endTransmission();
    b45ce:	69a0      	ldr	r0, [r4, #24]
    b45d0:	f001 f944 	bl	b585c <_ZN7TwoWire15endTransmissionEv>
-
-  bus->requestFrom(address, (uint8_t)2);
    b45d4:	7f21      	ldrb	r1, [r4, #28]
-  last_status = bus->endTransmission();
    b45d6:	7320      	strb	r0, [r4, #12]
-  bus->requestFrom(address, (uint8_t)2);
    b45d8:	2202      	movs	r2, #2
    b45da:	69a0      	ldr	r0, [r4, #24]
    b45dc:	f001 f933 	bl	b5846 <_ZN7TwoWire11requestFromEhj>
-  value  = (uint16_t)bus->read() << 8; // value high byte
    b45e0:	69a0      	ldr	r0, [r4, #24]
    b45e2:	6803      	ldr	r3, [r0, #0]
    b45e4:	695b      	ldr	r3, [r3, #20]
    b45e6:	4798      	blx	r3
    b45e8:	4605      	mov	r5, r0
-  value |=           bus->read();      // value low byte
    b45ea:	69a0      	ldr	r0, [r4, #24]
    b45ec:	6803      	ldr	r3, [r0, #0]
    b45ee:	695b      	ldr	r3, [r3, #20]
    b45f0:	4798      	blx	r3
    b45f2:	ea40 2005 	orr.w	r0, r0, r5, lsl #8
-
-  return value;
-}
    b45f6:	b280      	uxth	r0, r0
    b45f8:	bd38      	pop	{r3, r4, r5, pc}
 
 000b45fa <_ZN7VL53L1X15startContinuousEm>:
-}
-
-// Start continuous ranging measurements, with the given inter-measurement
-// period in milliseconds determining how often the sensor takes a measurement.
-void VL53L1X::startContinuous(uint32_t period_ms)
-{
    b45fa:	b510      	push	{r4, lr}
-  // from VL53L1_set_inter_measurement_period_ms()
-  writeReg32Bit(SYSTEM__INTERMEASUREMENT_PERIOD, period_ms * osc_calibrate_val);
    b45fc:	8cc2      	ldrh	r2, [r0, #38]	; 0x26
-{
    b45fe:	4604      	mov	r4, r0
-  writeReg32Bit(SYSTEM__INTERMEASUREMENT_PERIOD, period_ms * osc_calibrate_val);
    b4600:	434a      	muls	r2, r1
    b4602:	216c      	movs	r1, #108	; 0x6c
    b4604:	f7ff ff85 	bl	b4512 <_ZN7VL53L1X13writeReg32BitEtm>
-
-  writeReg(SYSTEM__INTERRUPT_CLEAR, 0x01); // sys_interrupt_clear_range
    b4608:	4620      	mov	r0, r4
    b460a:	2201      	movs	r2, #1
    b460c:	2186      	movs	r1, #134	; 0x86
    b460e:	f7ff ff43 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  writeReg(SYSTEM__MODE_START, 0x40); // mode_range__timed
    b4612:	4620      	mov	r0, r4
    b4614:	2240      	movs	r2, #64	; 0x40
-}
    b4616:	e8bd 4010 	ldmia.w	sp!, {r4, lr}
-  writeReg(SYSTEM__MODE_START, 0x40); // mode_range__timed
    b461a:	2187      	movs	r1, #135	; 0x87
    b461c:	f7ff bf3c 	b.w	b4498 <_ZN7VL53L1X8writeRegEth>
 
 000b4620 <_ZN7VL53L1X22setupManualCalibrationEv>:
-
-// "Setup ranges after the first one in low power auto mode by turning off
-// FW calibration steps and programming static values"
-// based on VL53L1_low_power_auto_setup_manual_calibration()
-void VL53L1X::setupManualCalibration()
-{
    b4620:	b510      	push	{r4, lr}
-  // "save original vhv configs"
-  saved_vhv_init = readReg(VHV_CONFIG__INIT);
    b4622:	210b      	movs	r1, #11
-{
    b4624:	4604      	mov	r4, r0
-  saved_vhv_init = readReg(VHV_CONFIG__INIT);
    b4626:	f7ff ffa1 	bl	b456c <_ZN7VL53L1X7readRegENS_7regAddrE>
-  saved_vhv_timeout = readReg(VHV_CONFIG__TIMEOUT_MACROP_LOOP_BOUND);
    b462a:	2108      	movs	r1, #8
-  saved_vhv_init = readReg(VHV_CONFIG__INIT);
    b462c:	f884 0029 	strb.w	r0, [r4, #41]	; 0x29
-  saved_vhv_timeout = readReg(VHV_CONFIG__TIMEOUT_MACROP_LOOP_BOUND);
    b4630:	4620      	mov	r0, r4
    b4632:	f7ff ff9b 	bl	b456c <_ZN7VL53L1X7readRegENS_7regAddrE>
-
-  // "disable VHV init"
-  writeReg(VHV_CONFIG__INIT, saved_vhv_init & 0x7F);
    b4636:	f894 2029 	ldrb.w	r2, [r4, #41]	; 0x29
-  saved_vhv_timeout = readReg(VHV_CONFIG__TIMEOUT_MACROP_LOOP_BOUND);
    b463a:	f884 002a 	strb.w	r0, [r4, #42]	; 0x2a
-  writeReg(VHV_CONFIG__INIT, saved_vhv_init & 0x7F);
    b463e:	f002 027f 	and.w	r2, r2, #127	; 0x7f
    b4642:	4620      	mov	r0, r4
    b4644:	210b      	movs	r1, #11
    b4646:	f7ff ff27 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-
-  // "set loop bound to tuning param"
-  writeReg(VHV_CONFIG__TIMEOUT_MACROP_LOOP_BOUND,
-    (saved_vhv_timeout & 0x03) + (3 << 2)); // tuning parm default (LOWPOWERAUTO_VHV_LOOP_BOUND_DEFAULT)
    b464a:	f894 202a 	ldrb.w	r2, [r4, #42]	; 0x2a
    b464e:	f002 0203 	and.w	r2, r2, #3
-  writeReg(VHV_CONFIG__TIMEOUT_MACROP_LOOP_BOUND,
    b4652:	4620      	mov	r0, r4
    b4654:	320c      	adds	r2, #12
    b4656:	2108      	movs	r1, #8
    b4658:	f7ff ff1e 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-
-  // "override phasecal"
-  writeReg(PHASECAL_CONFIG__OVERRIDE, 0x01);
    b465c:	2201      	movs	r2, #1
    b465e:	4620      	mov	r0, r4
    b4660:	214d      	movs	r1, #77	; 0x4d
    b4662:	f7ff ff19 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  writeReg(CAL_CONFIG__VCSEL_START, readReg(PHASECAL_RESULT__VCSEL_START));
    b4666:	21d8      	movs	r1, #216	; 0xd8
    b4668:	4620      	mov	r0, r4
    b466a:	f7ff ff7f 	bl	b456c <_ZN7VL53L1X7readRegENS_7regAddrE>
    b466e:	2147      	movs	r1, #71	; 0x47
    b4670:	4602      	mov	r2, r0
    b4672:	4620      	mov	r0, r4
-}
    b4674:	e8bd 4010 	ldmia.w	sp!, {r4, lr}
-  writeReg(CAL_CONFIG__VCSEL_START, readReg(PHASECAL_RESULT__VCSEL_START));
    b4678:	f7ff bf0e 	b.w	b4498 <_ZN7VL53L1X8writeRegEth>
 
 000b467c <_ZN7VL53L1X11readResultsEv>:
-
-// read measurement results into buffer
-void VL53L1X::readResults()
-{
    b467c:	b510      	push	{r4, lr}
    b467e:	4604      	mov	r4, r0
-  bus->beginTransmission(address);
    b4680:	7f01      	ldrb	r1, [r0, #28]
    b4682:	6980      	ldr	r0, [r0, #24]
    b4684:	f001 f8e2 	bl	b584c <_ZN7TwoWire17beginTransmissionEh>
-  bus->write((uint8_t)(RESULT__RANGE_STATUS >> 8)); // reg high byte
    b4688:	69a0      	ldr	r0, [r4, #24]
    b468a:	6803      	ldr	r3, [r0, #0]
    b468c:	2100      	movs	r1, #0
    b468e:	689b      	ldr	r3, [r3, #8]
    b4690:	4798      	blx	r3
-  bus->write((uint8_t)(RESULT__RANGE_STATUS));      // reg low byte
    b4692:	69a0      	ldr	r0, [r4, #24]
    b4694:	6803      	ldr	r3, [r0, #0]
    b4696:	2189      	movs	r1, #137	; 0x89
    b4698:	689b      	ldr	r3, [r3, #8]
    b469a:	4798      	blx	r3
-  last_status = bus->endTransmission();
    b469c:	69a0      	ldr	r0, [r4, #24]
    b469e:	f001 f8dd 	bl	b585c <_ZN7TwoWire15endTransmissionEv>
-
-  bus->requestFrom(address, (uint8_t)17);
    b46a2:	7f21      	ldrb	r1, [r4, #28]
-  last_status = bus->endTransmission();
    b46a4:	7320      	strb	r0, [r4, #12]
-  bus->requestFrom(address, (uint8_t)17);
    b46a6:	2211      	movs	r2, #17
    b46a8:	69a0      	ldr	r0, [r4, #24]
    b46aa:	f001 f8cc 	bl	b5846 <_ZN7TwoWire11requestFromEhj>
-
-  results.range_status = bus->read();
    b46ae:	69a0      	ldr	r0, [r4, #24]
    b46b0:	6803      	ldr	r3, [r0, #0]
    b46b2:	695b      	ldr	r3, [r3, #20]
    b46b4:	4798      	blx	r3
    b46b6:	73a0      	strb	r0, [r4, #14]
-
-  bus->read(); // report_status: not used
    b46b8:	69a0      	ldr	r0, [r4, #24]
    b46ba:	6803      	ldr	r3, [r0, #0]
    b46bc:	695b      	ldr	r3, [r3, #20]
    b46be:	4798      	blx	r3
-
-  results.stream_count = bus->read();
    b46c0:	69a0      	ldr	r0, [r4, #24]
    b46c2:	6803      	ldr	r3, [r0, #0]
    b46c4:	695b      	ldr	r3, [r3, #20]
    b46c6:	4798      	blx	r3
    b46c8:	73e0      	strb	r0, [r4, #15]
-
-  results.dss_actual_effective_spads_sd0  = (uint16_t)bus->read() << 8; // high byte
    b46ca:	69a0      	ldr	r0, [r4, #24]
    b46cc:	6803      	ldr	r3, [r0, #0]
    b46ce:	695b      	ldr	r3, [r3, #20]
    b46d0:	4798      	blx	r3
    b46d2:	0200      	lsls	r0, r0, #8
    b46d4:	8220      	strh	r0, [r4, #16]
-  results.dss_actual_effective_spads_sd0 |=           bus->read();      // low byte
    b46d6:	69a0      	ldr	r0, [r4, #24]
    b46d8:	6803      	ldr	r3, [r0, #0]
    b46da:	695b      	ldr	r3, [r3, #20]
@@ -1246,26 +997,20 @@ void VL53L1X::readResults()
    b46de:	8a23      	ldrh	r3, [r4, #16]
    b46e0:	4318      	orrs	r0, r3
    b46e2:	8220      	strh	r0, [r4, #16]
-
-  bus->read(); // peak_signal_count_rate_mcps_sd0: not used
    b46e4:	69a0      	ldr	r0, [r4, #24]
    b46e6:	6803      	ldr	r3, [r0, #0]
    b46e8:	695b      	ldr	r3, [r3, #20]
    b46ea:	4798      	blx	r3
-  bus->read();
    b46ec:	69a0      	ldr	r0, [r4, #24]
    b46ee:	6803      	ldr	r3, [r0, #0]
    b46f0:	695b      	ldr	r3, [r3, #20]
    b46f2:	4798      	blx	r3
-
-  results.ambient_count_rate_mcps_sd0  = (uint16_t)bus->read() << 8; // high byte
    b46f4:	69a0      	ldr	r0, [r4, #24]
    b46f6:	6803      	ldr	r3, [r0, #0]
    b46f8:	695b      	ldr	r3, [r3, #20]
    b46fa:	4798      	blx	r3
    b46fc:	0200      	lsls	r0, r0, #8
    b46fe:	8260      	strh	r0, [r4, #18]
-  results.ambient_count_rate_mcps_sd0 |=           bus->read();      // low byte
    b4700:	69a0      	ldr	r0, [r4, #24]
    b4702:	6803      	ldr	r3, [r0, #0]
    b4704:	695b      	ldr	r3, [r3, #20]
@@ -1273,37 +1018,28 @@ void VL53L1X::readResults()
    b4708:	8a63      	ldrh	r3, [r4, #18]
    b470a:	4318      	orrs	r0, r3
    b470c:	8260      	strh	r0, [r4, #18]
-
-  bus->read(); // sigma_sd0: not used
    b470e:	69a0      	ldr	r0, [r4, #24]
    b4710:	6803      	ldr	r3, [r0, #0]
    b4712:	695b      	ldr	r3, [r3, #20]
    b4714:	4798      	blx	r3
-  bus->read();
    b4716:	69a0      	ldr	r0, [r4, #24]
    b4718:	6803      	ldr	r3, [r0, #0]
    b471a:	695b      	ldr	r3, [r3, #20]
    b471c:	4798      	blx	r3
-
-  bus->read(); // phase_sd0: not used
    b471e:	69a0      	ldr	r0, [r4, #24]
    b4720:	6803      	ldr	r3, [r0, #0]
    b4722:	695b      	ldr	r3, [r3, #20]
    b4724:	4798      	blx	r3
-  bus->read();
    b4726:	69a0      	ldr	r0, [r4, #24]
    b4728:	6803      	ldr	r3, [r0, #0]
    b472a:	695b      	ldr	r3, [r3, #20]
    b472c:	4798      	blx	r3
-
-  results.final_crosstalk_corrected_range_mm_sd0  = (uint16_t)bus->read() << 8; // high byte
    b472e:	69a0      	ldr	r0, [r4, #24]
    b4730:	6803      	ldr	r3, [r0, #0]
    b4732:	695b      	ldr	r3, [r3, #20]
    b4734:	4798      	blx	r3
    b4736:	0200      	lsls	r0, r0, #8
    b4738:	82a0      	strh	r0, [r4, #20]
-  results.final_crosstalk_corrected_range_mm_sd0 |=           bus->read();      // low byte
    b473a:	69a0      	ldr	r0, [r4, #24]
    b473c:	6803      	ldr	r3, [r0, #0]
    b473e:	695b      	ldr	r3, [r3, #20]
@@ -1311,15 +1047,12 @@ void VL53L1X::readResults()
    b4742:	8aa3      	ldrh	r3, [r4, #20]
    b4744:	4318      	orrs	r0, r3
    b4746:	82a0      	strh	r0, [r4, #20]
-
-  results.peak_signal_count_rate_crosstalk_corrected_mcps_sd0  = (uint16_t)bus->read() << 8; // high byte
    b4748:	69a0      	ldr	r0, [r4, #24]
    b474a:	6803      	ldr	r3, [r0, #0]
    b474c:	695b      	ldr	r3, [r3, #20]
    b474e:	4798      	blx	r3
    b4750:	0200      	lsls	r0, r0, #8
    b4752:	82e0      	strh	r0, [r4, #22]
-  results.peak_signal_count_rate_crosstalk_corrected_mcps_sd0 |=           bus->read();      // low byte
    b4754:	69a0      	ldr	r0, [r4, #24]
    b4756:	6803      	ldr	r3, [r0, #0]
    b4758:	695b      	ldr	r3, [r3, #20]
@@ -1327,78 +1060,32 @@ void VL53L1X::readResults()
    b475c:	8ae3      	ldrh	r3, [r4, #22]
    b475e:	4318      	orrs	r0, r3
    b4760:	82e0      	strh	r0, [r4, #22]
-}
    b4762:	bd10      	pop	{r4, pc}
 
 000b4764 <_ZN7VL53L1X9updateDSSEv>:
-
-// perform Dynamic SPAD Selection calculation/update
-// based on VL53L1_low_power_auto_update_DSS()
-void VL53L1X::updateDSS()
-{
    b4764:	b430      	push	{r4, r5}
-  uint16_t spadCount = results.dss_actual_effective_spads_sd0;
    b4766:	8a04      	ldrh	r4, [r0, #16]
-{
    b4768:	4603      	mov	r3, r0
-
-  if (spadCount != 0)
    b476a:	b1d4      	cbz	r4, b47a2 <_ZN7VL53L1X9updateDSSEv+0x3e>
-  {
-    // "Calc total rate per spad"
-
-    uint32_t totalRatePerSpad =
-      (uint32_t)results.peak_signal_count_rate_crosstalk_corrected_mcps_sd0 +
-      results.ambient_count_rate_mcps_sd0;
    b476c:	8a42      	ldrh	r2, [r0, #18]
-      (uint32_t)results.peak_signal_count_rate_crosstalk_corrected_mcps_sd0 +
    b476e:	8ac1      	ldrh	r1, [r0, #22]
    b4770:	f64f 75ff 	movw	r5, #65535	; 0xffff
-    uint32_t totalRatePerSpad =
    b4774:	4411      	add	r1, r2
-
-    // "clip to 16 bits"
-    if (totalRatePerSpad > 0xFFFF) { totalRatePerSpad = 0xFFFF; }
    b4776:	42a9      	cmp	r1, r5
    b4778:	bf28      	it	cs
    b477a:	4629      	movcs	r1, r5
-    // "shift up to take advantage of 32 bits"
-    totalRatePerSpad <<= 16;
-
-    totalRatePerSpad /= spadCount;
-
-    if (totalRatePerSpad != 0)
    b477c:	ebb4 4f01 	cmp.w	r4, r1, lsl #16
-    totalRatePerSpad <<= 16;
    b4780:	ea4f 4201 	mov.w	r2, r1, lsl #16
-    if (totalRatePerSpad != 0)
    b4784:	d80d      	bhi.n	b47a2 <_ZN7VL53L1X9updateDSSEv+0x3e>
-    totalRatePerSpad /= spadCount;
    b4786:	fbb2 f2f4 	udiv	r2, r2, r4
-    {
-      // "get the target rate and shift up by 16"
-      uint32_t requiredSpads = ((uint32_t)TargetRate << 16) / totalRatePerSpad;
    b478a:	f04f 6320 	mov.w	r3, #167772160	; 0xa000000
    b478e:	fbb3 f2f2 	udiv	r2, r3, r2
-
-      // "clip to 16 bit"
-      if (requiredSpads > 0xFFFF) { requiredSpads = 0xFFFF; }
-
-      // "override DSS config"
-      writeReg16Bit(DSS_CONFIG__MANUAL_EFFECTIVE_SPADS_SELECT, requiredSpads);
    b4792:	42aa      	cmp	r2, r5
    b4794:	bf28      	it	cs
    b4796:	462a      	movcs	r2, r5
    b4798:	b292      	uxth	r2, r2
    b479a:	2154      	movs	r1, #84	; 0x54
-  // divide by zero.
-  // "We want to gracefully set a spad target, not just exit with an error"
-
-   // "set target to mid point"
-   writeReg16Bit(DSS_CONFIG__MANUAL_EFFECTIVE_SPADS_SELECT, 0x8000);
-}
    b479c:	bc30      	pop	{r4, r5}
-   writeReg16Bit(DSS_CONFIG__MANUAL_EFFECTIVE_SPADS_SELECT, 0x8000);
    b479e:	f7ff be97 	b.w	b44d0 <_ZN7VL53L1X13writeReg16BitEtt>
    b47a2:	f44f 4200 	mov.w	r2, #32768	; 0x8000
    b47a6:	2154      	movs	r1, #84	; 0x54
@@ -1406,24 +1093,12 @@ void VL53L1X::updateDSS()
    b47aa:	e7f7      	b.n	b479c <_ZN7VL53L1X9updateDSSEv+0x38>
 
 000b47ac <_ZN7VL53L1X14getRangingDataEv>:
-
-  // "apply correction gain"
-  // gain factor of 2011 is tuning parm default (VL53L1_TUNINGPARM_LITE_RANGING_GAIN_FACTOR_DEFAULT)
-  // Basically, this appears to scale the result by 2011/2048, or about 98%
-  // (with the 1024 added for proper rounding).
-  ranging_data.range_mm = ((uint32_t)range * 2011 + 0x0400) / 0x0800;
    b47ac:	8a83      	ldrh	r3, [r0, #20]
    b47ae:	f240 72db 	movw	r2, #2011	; 0x7db
    b47b2:	4353      	muls	r3, r2
    b47b4:	f503 6380 	add.w	r3, r3, #1024	; 0x400
    b47b8:	0adb      	lsrs	r3, r3, #11
    b47ba:	8003      	strh	r3, [r0, #0]
-
-  // VL53L1_copy_sys_and_core_results_to_range_results() end
-
-  // set range_status in ranging_data based on value of RESULT__RANGE_STATUS register
-  // mostly based on ConvertStatusLite()
-  switch(results.range_status)
    b47bc:	7b83      	ldrb	r3, [r0, #14]
    b47be:	3b01      	subs	r3, #1
    b47c0:	2b11      	cmp	r3, #17
@@ -1434,26 +1109,8 @@ void VL53L1X::updateDSS()
    b47d0:	2c363630 	.word	0x2c363630
    b47d4:	36363620 	.word	0x36363620
    b47d8:	2209      	.short	0x2209
-    case 17: // MULTCLIPFAIL
-    case 2: // VCSELWATCHDOGTESTFAILURE
-    case 1: // VCSELCONTINUITYTESTFAILURE
-    case 3: // NOVHVVALUEFOUND
-      // from SetSimpleData()
-      ranging_data.range_status = HardwareFail;
    b47da:	2305      	movs	r3, #5
-        ranging_data.range_status = RangeValid;
-      }
-      break;
-
-    default:
-      ranging_data.range_status = None;
    b47dc:	7083      	strb	r3, [r0, #2]
-    static uint32_t timeoutMclksToMicroseconds(uint32_t timeout_mclks, uint32_t macro_period_us);
-    static uint32_t timeoutMicrosecondsToMclks(uint32_t timeout_us, uint32_t macro_period_us);
-    uint32_t calcMacroPeriod(uint8_t vcsel_period);
-
-    // Convert count rate from fixed point 9.7 format to float
-    float countRateFixedToFloat(uint16_t count_rate_fixed) { return (float)count_rate_fixed / (1 << 7); }
    b47de:	8ac3      	ldrh	r3, [r0, #22]
    b47e0:	eddf 6a15 	vldr	s13, [pc, #84]	; b4838 <_ZN7VL53L1X14getRangingDataEv+0x8c>
    b47e4:	ee07 3a10 	vmov	s14, r3
@@ -1463,467 +1120,311 @@ void VL53L1X::updateDSS()
    b47f2:	eef8 7a67 	vcvt.f32.u32	s15, s15
    b47f6:	ee27 7a26 	vmul.f32	s14, s14, s13
    b47fa:	ee67 7aa6 	vmul.f32	s15, s15, s13
-  }
-
-  // from SetSimpleData()
-  ranging_data.peak_signal_count_rate_MCPS =
    b47fe:	ed80 7a01 	vstr	s14, [r0, #4]
-    countRateFixedToFloat(results.peak_signal_count_rate_crosstalk_corrected_mcps_sd0);
-  ranging_data.ambient_count_rate_MCPS =
    b4802:	edc0 7a02 	vstr	s15, [r0, #8]
-    countRateFixedToFloat(results.ambient_count_rate_mcps_sd0);
-}
    b4806:	4770      	bx	lr
-      ranging_data.range_status = MinRangeFail;
    b4808:	230d      	movs	r3, #13
    b480a:	e7e7      	b.n	b47dc <_ZN7VL53L1X14getRangingDataEv+0x30>
-      ranging_data.range_status = SynchronizationInt;
    b480c:	230a      	movs	r3, #10
    b480e:	e7e5      	b.n	b47dc <_ZN7VL53L1X14getRangingDataEv+0x30>
-      ranging_data.range_status =  OutOfBoundsFail;
    b4810:	2304      	movs	r3, #4
    b4812:	e7e3      	b.n	b47dc <_ZN7VL53L1X14getRangingDataEv+0x30>
-      ranging_data.range_status = SignalFail;
    b4814:	2302      	movs	r3, #2
    b4816:	e7e1      	b.n	b47dc <_ZN7VL53L1X14getRangingDataEv+0x30>
-      ranging_data.range_status = SigmaFail;
    b4818:	2301      	movs	r3, #1
    b481a:	e7df      	b.n	b47dc <_ZN7VL53L1X14getRangingDataEv+0x30>
-      ranging_data.range_status = WrapTargetFail;
    b481c:	2307      	movs	r3, #7
    b481e:	e7dd      	b.n	b47dc <_ZN7VL53L1X14getRangingDataEv+0x30>
-      ranging_data.range_status = XtalkSignalFail;
    b4820:	2309      	movs	r3, #9
    b4822:	e7db      	b.n	b47dc <_ZN7VL53L1X14getRangingDataEv+0x30>
-      ranging_data.range_status = RangeValidMinRangeClipped;
    b4824:	2303      	movs	r3, #3
    b4826:	e7d9      	b.n	b47dc <_ZN7VL53L1X14getRangingDataEv+0x30>
-      if (results.stream_count == 0)
    b4828:	7bc3      	ldrb	r3, [r0, #15]
    b482a:	b90b      	cbnz	r3, b4830 <_ZN7VL53L1X14getRangingDataEv+0x84>
-        ranging_data.range_status = RangeValidNoWrapCheckFail;
    b482c:	2306      	movs	r3, #6
    b482e:	e7d5      	b.n	b47dc <_ZN7VL53L1X14getRangingDataEv+0x30>
-        ranging_data.range_status = RangeValid;
    b4830:	2300      	movs	r3, #0
    b4832:	e7d3      	b.n	b47dc <_ZN7VL53L1X14getRangingDataEv+0x30>
-      ranging_data.range_status = None;
    b4834:	23ff      	movs	r3, #255	; 0xff
    b4836:	e7d1      	b.n	b47dc <_ZN7VL53L1X14getRangingDataEv+0x30>
    b4838:	3c000000 	.word	0x3c000000
 
 000b483c <_ZN7VL53L1X4readEb>:
-{
    b483c:	b538      	push	{r3, r4, r5, lr}
    b483e:	4604      	mov	r4, r0
-  if (blocking)
    b4840:	b1a1      	cbz	r1, b486c <_ZN7VL53L1X4readEb+0x30>
    b4842:	f000 fa2b 	bl	b4c9c <HAL_Timer_Get_Milli_Seconds>
-    void startTimeout() { timeout_start_ms = millis(); }
    b4846:	8460      	strh	r0, [r4, #34]	; 0x22
-    bool dataReady() { return (readReg(GPIO__TIO_HV_STATUS) & 0x01) == 0; }
    b4848:	2131      	movs	r1, #49	; 0x31
    b484a:	4620      	mov	r0, r4
    b484c:	f7ff fe8e 	bl	b456c <_ZN7VL53L1X7readRegENS_7regAddrE>
    b4850:	43c0      	mvns	r0, r0
-    while (!dataReady())
    b4852:	f010 0501 	ands.w	r5, r0, #1
    b4856:	d109      	bne.n	b486c <_ZN7VL53L1X4readEb+0x30>
-      if (checkTimeoutExpired())
    b4858:	4620      	mov	r0, r4
    b485a:	f7ff fdfe 	bl	b445a <_ZN7VL53L1X19checkTimeoutExpiredEv>
    b485e:	2800      	cmp	r0, #0
    b4860:	d0f2      	beq.n	b4848 <_ZN7VL53L1X4readEb+0xc>
-        did_timeout = true;
    b4862:	2301      	movs	r3, #1
    b4864:	f884 3020 	strb.w	r3, [r4, #32]
-        return 0;
    b4868:	4628      	mov	r0, r5
-}
    b486a:	bd38      	pop	{r3, r4, r5, pc}
-  readResults();
    b486c:	4620      	mov	r0, r4
    b486e:	f7ff ff05 	bl	b467c <_ZN7VL53L1X11readResultsEv>
-  if (!calibrated)
    b4872:	f894 3028 	ldrb.w	r3, [r4, #40]	; 0x28
    b4876:	b92b      	cbnz	r3, b4884 <_ZN7VL53L1X4readEb+0x48>
-    setupManualCalibration();
    b4878:	4620      	mov	r0, r4
    b487a:	f7ff fed1 	bl	b4620 <_ZN7VL53L1X22setupManualCalibrationEv>
-    calibrated = true;
    b487e:	2301      	movs	r3, #1
    b4880:	f884 3028 	strb.w	r3, [r4, #40]	; 0x28
-  updateDSS();
    b4884:	4620      	mov	r0, r4
    b4886:	f7ff ff6d 	bl	b4764 <_ZN7VL53L1X9updateDSSEv>
-  getRangingData();
    b488a:	4620      	mov	r0, r4
    b488c:	f7ff ff8e 	bl	b47ac <_ZN7VL53L1X14getRangingDataEv>
-  writeReg(SYSTEM__INTERRUPT_CLEAR, 0x01); // sys_interrupt_clear_range
    b4890:	2186      	movs	r1, #134	; 0x86
    b4892:	2201      	movs	r2, #1
    b4894:	f7ff fe00 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  return ranging_data.range_mm;
    b4898:	8820      	ldrh	r0, [r4, #0]
    b489a:	e7e6      	b.n	b486a <_ZN7VL53L1X4readEb+0x2e>
 
 000b489c <_ZN7VL53L1X13decodeTimeoutEt>:
-
-// Decode sequence step timeout in MCLKs from register value
-// based on VL53L1_decode_timeout()
-uint32_t VL53L1X::decodeTimeout(uint16_t reg_val)
-{
-  return ((uint32_t)(reg_val & 0xFF) << (reg_val >> 8)) + 1;
    b489c:	b2c3      	uxtb	r3, r0
    b489e:	0a00      	lsrs	r0, r0, #8
    b48a0:	fa03 f000 	lsl.w	r0, r3, r0
-}
    b48a4:	3001      	adds	r0, #1
    b48a6:	4770      	bx	lr
 
 000b48a8 <_ZN7VL53L1X13encodeTimeoutEm>:
-  // encoded format: "(LSByte * 2^MSByte) + 1"
-
-  uint32_t ls_byte = 0;
-  uint16_t ms_byte = 0;
-
-  if (timeout_mclks > 0)
    b48a8:	b160      	cbz	r0, b48c4 <_ZN7VL53L1X13encodeTimeoutEm+0x1c>
-  {
-    ls_byte = timeout_mclks - 1;
    b48aa:	3801      	subs	r0, #1
    b48ac:	2300      	movs	r3, #0
-
-    while ((ls_byte & 0xFFFFFF00) > 0)
    b48ae:	f030 01ff 	bics.w	r1, r0, #255	; 0xff
    b48b2:	b29a      	uxth	r2, r3
    b48b4:	f103 0301 	add.w	r3, r3, #1
    b48b8:	d001      	beq.n	b48be <_ZN7VL53L1X13encodeTimeoutEm+0x16>
-    {
-      ls_byte >>= 1;
    b48ba:	0840      	lsrs	r0, r0, #1
-    while ((ls_byte & 0xFFFFFF00) > 0)
    b48bc:	e7f7      	b.n	b48ae <_ZN7VL53L1X13encodeTimeoutEm+0x6>
-      ms_byte++;
-    }
-
-    return (ms_byte << 8) | (ls_byte & 0xFF);
    b48be:	ea40 2002 	orr.w	r0, r0, r2, lsl #8
    b48c2:	b280      	uxth	r0, r0
-  }
-  else { return 0; }
-}
    b48c4:	4770      	bx	lr
 
 000b48c6 <_ZN7VL53L1X15calcMacroPeriodEh>:
-// based on VL53L1_calc_macro_period_us()
-uint32_t VL53L1X::calcMacroPeriod(uint8_t vcsel_period)
-{
-  // from VL53L1_calc_pll_period_us()
-  // fast osc frequency in 4.12 format; PLL period in 0.24 format
-  uint32_t pll_period_us = ((uint32_t)0x01 << 30) / fast_osc_frequency;
    b48c6:	8c83      	ldrh	r3, [r0, #36]	; 0x24
    b48c8:	f04f 4080 	mov.w	r0, #1073741824	; 0x40000000
    b48cc:	fbb0 f0f3 	udiv	r0, r0, r3
-
-  // from VL53L1_decode_vcsel_period()
-  uint8_t vcsel_period_pclks = (vcsel_period + 1) << 1;
-
-  // VL53L1_MACRO_PERIOD_VCSEL_PERIODS = 2304
-  uint32_t macro_period_us = (uint32_t)2304 * pll_period_us;
    b48d0:	f44f 6310 	mov.w	r3, #2304	; 0x900
    b48d4:	4358      	muls	r0, r3
-  macro_period_us >>= 6;
    b48d6:	0983      	lsrs	r3, r0, #6
-  uint8_t vcsel_period_pclks = (vcsel_period + 1) << 1;
    b48d8:	1c48      	adds	r0, r1, #1
    b48da:	0040      	lsls	r0, r0, #1
-  macro_period_us *= vcsel_period_pclks;
    b48dc:	b2c0      	uxtb	r0, r0
    b48de:	4358      	muls	r0, r3
-  macro_period_us >>= 6;
-
-  return macro_period_us;
    b48e0:	0980      	lsrs	r0, r0, #6
    b48e2:	4770      	bx	lr
 
 000b48e4 <_ZN7VL53L1X26setMeasurementTimingBudgetEm>:
-  if (budget_us <= TimingGuard) { return false; }
    b48e4:	f241 13b0 	movw	r3, #4528	; 0x11b0
    b48e8:	4299      	cmp	r1, r3
-{
    b48ea:	e92d 41f0 	stmdb	sp!, {r4, r5, r6, r7, r8, lr}
    b48ee:	4605      	mov	r5, r0
-  if (budget_us <= TimingGuard) { return false; }
    b48f0:	d956      	bls.n	b49a0 <_ZN7VL53L1X26setMeasurementTimingBudgetEm+0xbc>
-  if (range_config_timeout_us > 1100000) { return false; } // FDA_MAX_TIMING_BUDGET_US * 2
    b48f2:	4b2c      	ldr	r3, [pc, #176]	; (b49a4 <_ZN7VL53L1X26setMeasurementTimingBudgetEm+0xc0>)
-  uint32_t range_config_timeout_us = budget_us -= TimingGuard;
    b48f4:	f5a1 548d 	sub.w	r4, r1, #4512	; 0x11a0
    b48f8:	3c10      	subs	r4, #16
-  if (range_config_timeout_us > 1100000) { return false; } // FDA_MAX_TIMING_BUDGET_US * 2
    b48fa:	429c      	cmp	r4, r3
    b48fc:	d850      	bhi.n	b49a0 <_ZN7VL53L1X26setMeasurementTimingBudgetEm+0xbc>
-  macro_period_us = calcMacroPeriod(readReg(RANGE_CONFIG__VCSEL_PERIOD_A));
    b48fe:	2160      	movs	r1, #96	; 0x60
    b4900:	f7ff fe34 	bl	b456c <_ZN7VL53L1X7readRegENS_7regAddrE>
    b4904:	4601      	mov	r1, r0
    b4906:	4628      	mov	r0, r5
    b4908:	f7ff ffdd 	bl	b48c6 <_ZN7VL53L1X15calcMacroPeriodEh>
-  return (((uint32_t)timeout_us << 12) + (macro_period_us >> 1)) / macro_period_us;
    b490c:	0847      	lsrs	r7, r0, #1
    b490e:	f507 127a 	add.w	r2, r7, #4096000	; 0x3e8000
    b4912:	fbb2 f2f0 	udiv	r2, r2, r0
-  writeReg(PHASECAL_CONFIG__TIMEOUT_MACROP, phasecal_timeout_mclks);
    b4916:	2aff      	cmp	r2, #255	; 0xff
    b4918:	bf28      	it	cs
    b491a:	22ff      	movcs	r2, #255	; 0xff
-  macro_period_us = calcMacroPeriod(readReg(RANGE_CONFIG__VCSEL_PERIOD_A));
    b491c:	4606      	mov	r6, r0
-  writeReg(PHASECAL_CONFIG__TIMEOUT_MACROP, phasecal_timeout_mclks);
    b491e:	b2d2      	uxtb	r2, r2
    b4920:	214b      	movs	r1, #75	; 0x4b
    b4922:	4628      	mov	r0, r5
    b4924:	f7ff fdb8 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  return (((uint32_t)timeout_us << 12) + (macro_period_us >> 1)) / macro_period_us;
    b4928:	f507 5080 	add.w	r0, r7, #4096	; 0x1000
-  writeReg16Bit(MM_CONFIG__TIMEOUT_MACROP_A, encodeTimeout(
    b492c:	fbb0 f0f6 	udiv	r0, r0, r6
    b4930:	f7ff ffba 	bl	b48a8 <_ZN7VL53L1X13encodeTimeoutEm>
-  range_config_timeout_us /= 2;
    b4934:	0864      	lsrs	r4, r4, #1
-  writeReg16Bit(MM_CONFIG__TIMEOUT_MACROP_A, encodeTimeout(
    b4936:	4602      	mov	r2, r0
    b4938:	215a      	movs	r1, #90	; 0x5a
    b493a:	4628      	mov	r0, r5
    b493c:	f7ff fdc8 	bl	b44d0 <_ZN7VL53L1X13writeReg16BitEtt>
-  return (((uint32_t)timeout_us << 12) + (macro_period_us >> 1)) / macro_period_us;
    b4940:	ea4f 3804 	mov.w	r8, r4, lsl #12
    b4944:	eb07 3404 	add.w	r4, r7, r4, lsl #12
-  writeReg16Bit(RANGE_CONFIG__TIMEOUT_MACROP_A, encodeTimeout(
    b4948:	fbb4 f0f6 	udiv	r0, r4, r6
    b494c:	f7ff ffac 	bl	b48a8 <_ZN7VL53L1X13encodeTimeoutEm>
    b4950:	215e      	movs	r1, #94	; 0x5e
    b4952:	4602      	mov	r2, r0
    b4954:	4628      	mov	r0, r5
    b4956:	f7ff fdbb 	bl	b44d0 <_ZN7VL53L1X13writeReg16BitEtt>
-  macro_period_us = calcMacroPeriod(readReg(RANGE_CONFIG__VCSEL_PERIOD_B));
    b495a:	2163      	movs	r1, #99	; 0x63
    b495c:	4628      	mov	r0, r5
    b495e:	f7ff fe05 	bl	b456c <_ZN7VL53L1X7readRegENS_7regAddrE>
    b4962:	4601      	mov	r1, r0
    b4964:	4628      	mov	r0, r5
    b4966:	f7ff ffae 	bl	b48c6 <_ZN7VL53L1X15calcMacroPeriodEh>
-  return (((uint32_t)timeout_us << 12) + (macro_period_us >> 1)) / macro_period_us;
    b496a:	0846      	lsrs	r6, r0, #1
-  macro_period_us = calcMacroPeriod(readReg(RANGE_CONFIG__VCSEL_PERIOD_B));
    b496c:	4604      	mov	r4, r0
-  return (((uint32_t)timeout_us << 12) + (macro_period_us >> 1)) / macro_period_us;
    b496e:	f506 5080 	add.w	r0, r6, #4096	; 0x1000
-  writeReg16Bit(MM_CONFIG__TIMEOUT_MACROP_B, encodeTimeout(
    b4972:	fbb0 f0f4 	udiv	r0, r0, r4
    b4976:	f7ff ff97 	bl	b48a8 <_ZN7VL53L1X13encodeTimeoutEm>
    b497a:	215c      	movs	r1, #92	; 0x5c
    b497c:	4602      	mov	r2, r0
    b497e:	4628      	mov	r0, r5
    b4980:	f7ff fda6 	bl	b44d0 <_ZN7VL53L1X13writeReg16BitEtt>
-  return (((uint32_t)timeout_us << 12) + (macro_period_us >> 1)) / macro_period_us;
    b4984:	eb08 0006 	add.w	r0, r8, r6
-  writeReg16Bit(RANGE_CONFIG__TIMEOUT_MACROP_B, encodeTimeout(
    b4988:	fbb0 f0f4 	udiv	r0, r0, r4
    b498c:	f7ff ff8c 	bl	b48a8 <_ZN7VL53L1X13encodeTimeoutEm>
    b4990:	2161      	movs	r1, #97	; 0x61
    b4992:	4602      	mov	r2, r0
    b4994:	4628      	mov	r0, r5
    b4996:	f7ff fd9b 	bl	b44d0 <_ZN7VL53L1X13writeReg16BitEtt>
-  return true;
    b499a:	2001      	movs	r0, #1
-}
    b499c:	e8bd 81f0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, pc}
-  if (budget_us <= TimingGuard) { return false; }
    b49a0:	2000      	movs	r0, #0
    b49a2:	e7fb      	b.n	b499c <_ZN7VL53L1X26setMeasurementTimingBudgetEm+0xb8>
    b49a4:	0010c8e0 	.word	0x0010c8e0
 
 000b49a8 <_ZN7VL53L1X26getMeasurementTimingBudgetEv>:
-{
    b49a8:	b538      	push	{r3, r4, r5, lr}
-  uint32_t macro_period_us = calcMacroPeriod(readReg(RANGE_CONFIG__VCSEL_PERIOD_A));
    b49aa:	2160      	movs	r1, #96	; 0x60
-{
    b49ac:	4605      	mov	r5, r0
-  uint32_t macro_period_us = calcMacroPeriod(readReg(RANGE_CONFIG__VCSEL_PERIOD_A));
    b49ae:	f7ff fddd 	bl	b456c <_ZN7VL53L1X7readRegENS_7regAddrE>
    b49b2:	4601      	mov	r1, r0
    b49b4:	4628      	mov	r0, r5
    b49b6:	f7ff ff86 	bl	b48c6 <_ZN7VL53L1X15calcMacroPeriodEh>
-  uint32_t range_config_timeout_us = timeoutMclksToMicroseconds(decodeTimeout(
    b49ba:	215e      	movs	r1, #94	; 0x5e
-  uint32_t macro_period_us = calcMacroPeriod(readReg(RANGE_CONFIG__VCSEL_PERIOD_A));
    b49bc:	4604      	mov	r4, r0
-  uint32_t range_config_timeout_us = timeoutMclksToMicroseconds(decodeTimeout(
    b49be:	4628      	mov	r0, r5
    b49c0:	f7ff fdf4 	bl	b45ac <_ZN7VL53L1X12readReg16BitEt>
    b49c4:	f7ff ff6a 	bl	b489c <_ZN7VL53L1X13decodeTimeoutEt>
-  return ((uint64_t)timeout_mclks * macro_period_us + 0x800) >> 12;
    b49c8:	2200      	movs	r2, #0
    b49ca:	f44f 6300 	mov.w	r3, #2048	; 0x800
    b49ce:	fbe4 3200 	umlal	r3, r2, r4, r0
    b49d2:	0b18      	lsrs	r0, r3, #12
    b49d4:	ea40 5002 	orr.w	r0, r0, r2, lsl #20
-  return  2 * range_config_timeout_us + TimingGuard;
    b49d8:	f600 00d8 	addw	r0, r0, #2264	; 0x8d8
-}
    b49dc:	0040      	lsls	r0, r0, #1
    b49de:	bd38      	pop	{r3, r4, r5, pc}
 
 000b49e0 <_ZN7VL53L1X15setDistanceModeENS_12DistanceModeE>:
-{
    b49e0:	b570      	push	{r4, r5, r6, lr}
    b49e2:	460d      	mov	r5, r1
    b49e4:	4604      	mov	r4, r0
-  uint32_t budget_us = getMeasurementTimingBudget();
    b49e6:	f7ff ffdf 	bl	b49a8 <_ZN7VL53L1X26getMeasurementTimingBudgetEv>
-  switch (mode)
    b49ea:	2d01      	cmp	r5, #1
-  uint32_t budget_us = getMeasurementTimingBudget();
    b49ec:	4606      	mov	r6, r0
-  switch (mode)
    b49ee:	d02e      	beq.n	b4a4e <_ZN7VL53L1X15setDistanceModeENS_12DistanceModeE+0x6e>
    b49f0:	2d02      	cmp	r5, #2
    b49f2:	d04c      	beq.n	b4a8e <_ZN7VL53L1X15setDistanceModeENS_12DistanceModeE+0xae>
    b49f4:	2d00      	cmp	r5, #0
    b49f6:	d16a      	bne.n	b4ace <_ZN7VL53L1X15setDistanceModeENS_12DistanceModeE+0xee>
-      writeReg(RANGE_CONFIG__VCSEL_PERIOD_A, 0x07);
    b49f8:	2207      	movs	r2, #7
    b49fa:	2160      	movs	r1, #96	; 0x60
    b49fc:	4620      	mov	r0, r4
    b49fe:	f7ff fd4b 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-      writeReg(RANGE_CONFIG__VCSEL_PERIOD_B, 0x05);
    b4a02:	2205      	movs	r2, #5
    b4a04:	2163      	movs	r1, #99	; 0x63
    b4a06:	4620      	mov	r0, r4
    b4a08:	f7ff fd46 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-      writeReg(RANGE_CONFIG__VALID_PHASE_HIGH, 0x38);
    b4a0c:	2238      	movs	r2, #56	; 0x38
    b4a0e:	2169      	movs	r1, #105	; 0x69
    b4a10:	4620      	mov	r0, r4
    b4a12:	f7ff fd41 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-      writeReg(SD_CONFIG__WOI_SD0, 0x07);
    b4a16:	2207      	movs	r2, #7
    b4a18:	2178      	movs	r1, #120	; 0x78
    b4a1a:	4620      	mov	r0, r4
    b4a1c:	f7ff fd3c 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-      writeReg(SD_CONFIG__WOI_SD1, 0x05);
    b4a20:	2205      	movs	r2, #5
    b4a22:	2179      	movs	r1, #121	; 0x79
    b4a24:	4620      	mov	r0, r4
    b4a26:	f7ff fd37 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-      writeReg(SD_CONFIG__INITIAL_PHASE_SD0, 6); // tuning parm default
    b4a2a:	2206      	movs	r2, #6
    b4a2c:	217a      	movs	r1, #122	; 0x7a
    b4a2e:	4620      	mov	r0, r4
    b4a30:	f7ff fd32 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-      writeReg(SD_CONFIG__INITIAL_PHASE_SD1, 6); // tuning parm default
    b4a34:	2206      	movs	r2, #6
-      writeReg(SD_CONFIG__INITIAL_PHASE_SD1, 14); // tuning parm default
    b4a36:	217b      	movs	r1, #123	; 0x7b
    b4a38:	4620      	mov	r0, r4
    b4a3a:	f7ff fd2d 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  setMeasurementTimingBudget(budget_us);
    b4a3e:	4631      	mov	r1, r6
    b4a40:	4620      	mov	r0, r4
    b4a42:	f7ff ff4f 	bl	b48e4 <_ZN7VL53L1X26setMeasurementTimingBudgetEm>
-  distance_mode = mode;
    b4a46:	f884 502b 	strb.w	r5, [r4, #43]	; 0x2b
-  return true;
    b4a4a:	2001      	movs	r0, #1
-}
    b4a4c:	bd70      	pop	{r4, r5, r6, pc}
-      writeReg(RANGE_CONFIG__VCSEL_PERIOD_A, 0x0B);
    b4a4e:	220b      	movs	r2, #11
    b4a50:	2160      	movs	r1, #96	; 0x60
    b4a52:	4620      	mov	r0, r4
    b4a54:	f7ff fd20 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-      writeReg(RANGE_CONFIG__VCSEL_PERIOD_B, 0x09);
    b4a58:	2209      	movs	r2, #9
    b4a5a:	2163      	movs	r1, #99	; 0x63
    b4a5c:	4620      	mov	r0, r4
    b4a5e:	f7ff fd1b 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-      writeReg(RANGE_CONFIG__VALID_PHASE_HIGH, 0x78);
    b4a62:	2278      	movs	r2, #120	; 0x78
    b4a64:	2169      	movs	r1, #105	; 0x69
    b4a66:	4620      	mov	r0, r4
    b4a68:	f7ff fd16 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-      writeReg(SD_CONFIG__WOI_SD0, 0x0B);
    b4a6c:	220b      	movs	r2, #11
    b4a6e:	2178      	movs	r1, #120	; 0x78
    b4a70:	4620      	mov	r0, r4
    b4a72:	f7ff fd11 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-      writeReg(SD_CONFIG__WOI_SD1, 0x09);
    b4a76:	2209      	movs	r2, #9
    b4a78:	2179      	movs	r1, #121	; 0x79
    b4a7a:	4620      	mov	r0, r4
    b4a7c:	f7ff fd0c 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-      writeReg(SD_CONFIG__INITIAL_PHASE_SD0, 10); // tuning parm default
    b4a80:	220a      	movs	r2, #10
    b4a82:	217a      	movs	r1, #122	; 0x7a
    b4a84:	4620      	mov	r0, r4
    b4a86:	f7ff fd07 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-      writeReg(SD_CONFIG__INITIAL_PHASE_SD1, 10); // tuning parm default
    b4a8a:	220a      	movs	r2, #10
    b4a8c:	e7d3      	b.n	b4a36 <_ZN7VL53L1X15setDistanceModeENS_12DistanceModeE+0x56>
-      writeReg(RANGE_CONFIG__VCSEL_PERIOD_A, 0x0F);
    b4a8e:	220f      	movs	r2, #15
    b4a90:	2160      	movs	r1, #96	; 0x60
    b4a92:	4620      	mov	r0, r4
    b4a94:	f7ff fd00 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-      writeReg(RANGE_CONFIG__VCSEL_PERIOD_B, 0x0D);
    b4a98:	220d      	movs	r2, #13
    b4a9a:	2163      	movs	r1, #99	; 0x63
    b4a9c:	4620      	mov	r0, r4
    b4a9e:	f7ff fcfb 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-      writeReg(RANGE_CONFIG__VALID_PHASE_HIGH, 0xB8);
    b4aa2:	22b8      	movs	r2, #184	; 0xb8
    b4aa4:	2169      	movs	r1, #105	; 0x69
    b4aa6:	4620      	mov	r0, r4
    b4aa8:	f7ff fcf6 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-      writeReg(SD_CONFIG__WOI_SD0, 0x0F);
    b4aac:	220f      	movs	r2, #15
    b4aae:	2178      	movs	r1, #120	; 0x78
    b4ab0:	4620      	mov	r0, r4
    b4ab2:	f7ff fcf1 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-      writeReg(SD_CONFIG__WOI_SD1, 0x0D);
    b4ab6:	220d      	movs	r2, #13
    b4ab8:	2179      	movs	r1, #121	; 0x79
    b4aba:	4620      	mov	r0, r4
    b4abc:	f7ff fcec 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-      writeReg(SD_CONFIG__INITIAL_PHASE_SD0, 14); // tuning parm default
    b4ac0:	220e      	movs	r2, #14
    b4ac2:	217a      	movs	r1, #122	; 0x7a
    b4ac4:	4620      	mov	r0, r4
    b4ac6:	f7ff fce7 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-      writeReg(SD_CONFIG__INITIAL_PHASE_SD1, 14); // tuning parm default
    b4aca:	220e      	movs	r2, #14
    b4acc:	e7b3      	b.n	b4a36 <_ZN7VL53L1X15setDistanceModeENS_12DistanceModeE+0x56>
-  switch (mode)
    b4ace:	2000      	movs	r0, #0
    b4ad0:	e7bc      	b.n	b4a4c <_ZN7VL53L1X15setDistanceModeENS_12DistanceModeE+0x6c>
 
 000b4ad2 <_ZN7VL53L1X4initEb>:
-{
    b4ad2:	b538      	push	{r3, r4, r5, lr}
    b4ad4:	460d      	mov	r5, r1
-  if (readReg16Bit(IDENTIFICATION__MODEL_ID) != 0xEACC) { return false; }
    b4ad6:	f240 110f 	movw	r1, #271	; 0x10f
-{
    b4ada:	4604      	mov	r4, r0
-  if (readReg16Bit(IDENTIFICATION__MODEL_ID) != 0xEACC) { return false; }
    b4adc:	f7ff fd66 	bl	b45ac <_ZN7VL53L1X12readReg16BitEt>
    b4ae0:	f64e 23cc 	movw	r3, #60108	; 0xeacc
    b4ae4:	4298      	cmp	r0, r3
    b4ae6:	f040 80be 	bne.w	b4c66 <_ZN7VL53L1X4initEb+0x194>
-  writeReg(SOFT_RESET, 0x00);
    b4aea:	2200      	movs	r2, #0
    b4aec:	4611      	mov	r1, r2
    b4aee:	4620      	mov	r0, r4
@@ -1933,19 +1434,15 @@ void delay(unsigned long ms);
 inline void delayMicroseconds(unsigned int us) { HAL_Delay_Microseconds(us); }
    b4af4:	2064      	movs	r0, #100	; 0x64
    b4af6:	f000 f8c9 	bl	b4c8c <HAL_Delay_Microseconds>
-  writeReg(SOFT_RESET, 0x01);
    b4afa:	2201      	movs	r2, #1
    b4afc:	2100      	movs	r1, #0
    b4afe:	4620      	mov	r0, r4
    b4b00:	f7ff fcca 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  delay(1);
    b4b04:	2001      	movs	r0, #1
    b4b06:	f000 faf7 	bl	b50f8 <delay>
 inline system_tick_t millis(void) { return HAL_Timer_Get_Milli_Seconds(); }
    b4b0a:	f000 f8c7 	bl	b4c9c <HAL_Timer_Get_Milli_Seconds>
-    void startTimeout() { timeout_start_ms = millis(); }
    b4b0e:	8460      	strh	r0, [r4, #34]	; 0x22
-  while ((readReg(FIRMWARE__SYSTEM_STATUS) & 0x01) == 0 || last_status != 0)
    b4b10:	21e5      	movs	r1, #229	; 0xe5
    b4b12:	4620      	mov	r0, r4
    b4b14:	f7ff fd2a 	bl	b456c <_ZN7VL53L1X7readRegENS_7regAddrE>
@@ -1954,168 +1451,129 @@ inline system_tick_t millis(void) { return HAL_Timer_Get_Milli_Seconds(); }
    b4b1e:	7b23      	ldrb	r3, [r4, #12]
    b4b20:	2b00      	cmp	r3, #0
    b4b22:	f040 8097 	bne.w	b4c54 <_ZN7VL53L1X4initEb+0x182>
-  if (io_2v8)
    b4b26:	b155      	cbz	r5, b4b3e <_ZN7VL53L1X4initEb+0x6c>
-      readReg(PAD_I2C_HV__EXTSUP_CONFIG) | 0x01);
    b4b28:	212e      	movs	r1, #46	; 0x2e
    b4b2a:	4620      	mov	r0, r4
    b4b2c:	f7ff fd1e 	bl	b456c <_ZN7VL53L1X7readRegENS_7regAddrE>
-    writeReg(PAD_I2C_HV__EXTSUP_CONFIG,
    b4b30:	f040 0001 	orr.w	r0, r0, #1
    b4b34:	b2c2      	uxtb	r2, r0
    b4b36:	212e      	movs	r1, #46	; 0x2e
    b4b38:	4620      	mov	r0, r4
    b4b3a:	f7ff fcad 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  fast_osc_frequency = readReg16Bit(OSC_MEASURED__FAST_OSC__FREQUENCY);
    b4b3e:	2106      	movs	r1, #6
    b4b40:	4620      	mov	r0, r4
    b4b42:	f7ff fd33 	bl	b45ac <_ZN7VL53L1X12readReg16BitEt>
-  osc_calibrate_val = readReg16Bit(RESULT__OSC_CALIBRATE_VAL);
    b4b46:	21de      	movs	r1, #222	; 0xde
-  fast_osc_frequency = readReg16Bit(OSC_MEASURED__FAST_OSC__FREQUENCY);
    b4b48:	84a0      	strh	r0, [r4, #36]	; 0x24
-  osc_calibrate_val = readReg16Bit(RESULT__OSC_CALIBRATE_VAL);
    b4b4a:	4620      	mov	r0, r4
    b4b4c:	f7ff fd2e 	bl	b45ac <_ZN7VL53L1X12readReg16BitEt>
-  writeReg16Bit(DSS_CONFIG__TARGET_TOTAL_RATE_MCPS, TargetRate); // should already be this value after reset
    b4b50:	f44f 6220 	mov.w	r2, #2560	; 0xa00
-  osc_calibrate_val = readReg16Bit(RESULT__OSC_CALIBRATE_VAL);
    b4b54:	84e0      	strh	r0, [r4, #38]	; 0x26
-  writeReg16Bit(DSS_CONFIG__TARGET_TOTAL_RATE_MCPS, TargetRate); // should already be this value after reset
    b4b56:	2124      	movs	r1, #36	; 0x24
    b4b58:	4620      	mov	r0, r4
    b4b5a:	f7ff fcb9 	bl	b44d0 <_ZN7VL53L1X13writeReg16BitEtt>
-  writeReg(GPIO__TIO_HV_STATUS, 0x02);
    b4b5e:	2202      	movs	r2, #2
    b4b60:	2131      	movs	r1, #49	; 0x31
    b4b62:	4620      	mov	r0, r4
    b4b64:	f7ff fc98 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  writeReg(SIGMA_ESTIMATOR__EFFECTIVE_PULSE_WIDTH_NS, 8); // tuning parm default
    b4b68:	2208      	movs	r2, #8
    b4b6a:	2136      	movs	r1, #54	; 0x36
    b4b6c:	4620      	mov	r0, r4
    b4b6e:	f7ff fc93 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  writeReg(SIGMA_ESTIMATOR__EFFECTIVE_AMBIENT_WIDTH_NS, 16); // tuning parm default
    b4b72:	2210      	movs	r2, #16
    b4b74:	2137      	movs	r1, #55	; 0x37
    b4b76:	4620      	mov	r0, r4
    b4b78:	f7ff fc8e 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  writeReg(ALGO__CROSSTALK_COMPENSATION_VALID_HEIGHT_MM, 0x01);
    b4b7c:	2201      	movs	r2, #1
    b4b7e:	2139      	movs	r1, #57	; 0x39
    b4b80:	4620      	mov	r0, r4
    b4b82:	f7ff fc89 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  writeReg(ALGO__RANGE_IGNORE_VALID_HEIGHT_MM, 0xFF);
    b4b86:	22ff      	movs	r2, #255	; 0xff
    b4b88:	213e      	movs	r1, #62	; 0x3e
    b4b8a:	4620      	mov	r0, r4
    b4b8c:	f7ff fc84 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  writeReg(ALGO__RANGE_MIN_CLIP, 0); // tuning parm default
    b4b90:	2200      	movs	r2, #0
    b4b92:	213f      	movs	r1, #63	; 0x3f
    b4b94:	4620      	mov	r0, r4
    b4b96:	f7ff fc7f 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  writeReg(ALGO__CONSISTENCY_CHECK__TOLERANCE, 2); // tuning parm default
    b4b9a:	2202      	movs	r2, #2
    b4b9c:	2140      	movs	r1, #64	; 0x40
    b4b9e:	4620      	mov	r0, r4
    b4ba0:	f7ff fc7a 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  writeReg16Bit(SYSTEM__THRESH_RATE_HIGH, 0x0000);
    b4ba4:	2200      	movs	r2, #0
    b4ba6:	2150      	movs	r1, #80	; 0x50
    b4ba8:	4620      	mov	r0, r4
    b4baa:	f7ff fc91 	bl	b44d0 <_ZN7VL53L1X13writeReg16BitEtt>
-  writeReg16Bit(SYSTEM__THRESH_RATE_LOW, 0x0000);
    b4bae:	2200      	movs	r2, #0
    b4bb0:	2152      	movs	r1, #82	; 0x52
    b4bb2:	4620      	mov	r0, r4
    b4bb4:	f7ff fc8c 	bl	b44d0 <_ZN7VL53L1X13writeReg16BitEtt>
-  writeReg(DSS_CONFIG__APERTURE_ATTENUATION, 0x38);
    b4bb8:	2238      	movs	r2, #56	; 0x38
    b4bba:	2157      	movs	r1, #87	; 0x57
    b4bbc:	4620      	mov	r0, r4
    b4bbe:	f7ff fc6b 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  writeReg16Bit(RANGE_CONFIG__SIGMA_THRESH, 360); // tuning parm default
    b4bc2:	f44f 72b4 	mov.w	r2, #360	; 0x168
    b4bc6:	2164      	movs	r1, #100	; 0x64
    b4bc8:	4620      	mov	r0, r4
    b4bca:	f7ff fc81 	bl	b44d0 <_ZN7VL53L1X13writeReg16BitEtt>
-  writeReg16Bit(RANGE_CONFIG__MIN_COUNT_RATE_RTN_LIMIT_MCPS, 192); // tuning parm default
    b4bce:	22c0      	movs	r2, #192	; 0xc0
    b4bd0:	2166      	movs	r1, #102	; 0x66
    b4bd2:	4620      	mov	r0, r4
    b4bd4:	f7ff fc7c 	bl	b44d0 <_ZN7VL53L1X13writeReg16BitEtt>
-  writeReg(SYSTEM__GROUPED_PARAMETER_HOLD_0, 0x01);
    b4bd8:	2201      	movs	r2, #1
    b4bda:	2171      	movs	r1, #113	; 0x71
    b4bdc:	4620      	mov	r0, r4
    b4bde:	f7ff fc5b 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  writeReg(SYSTEM__GROUPED_PARAMETER_HOLD_1, 0x01);
    b4be2:	2201      	movs	r2, #1
    b4be4:	217c      	movs	r1, #124	; 0x7c
    b4be6:	4620      	mov	r0, r4
    b4be8:	f7ff fc56 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  writeReg(SD_CONFIG__QUANTIFIER, 2); // tuning parm default
    b4bec:	2202      	movs	r2, #2
    b4bee:	217e      	movs	r1, #126	; 0x7e
    b4bf0:	4620      	mov	r0, r4
    b4bf2:	f7ff fc51 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  writeReg(SYSTEM__GROUPED_PARAMETER_HOLD, 0x00);
    b4bf6:	2200      	movs	r2, #0
    b4bf8:	2182      	movs	r1, #130	; 0x82
    b4bfa:	4620      	mov	r0, r4
    b4bfc:	f7ff fc4c 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  writeReg(SYSTEM__SEED_CONFIG, 1); // tuning parm default
    b4c00:	2201      	movs	r2, #1
    b4c02:	2177      	movs	r1, #119	; 0x77
    b4c04:	4620      	mov	r0, r4
    b4c06:	f7ff fc47 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  writeReg(SYSTEM__SEQUENCE_CONFIG, 0x8B); // VHV, PHASECAL, DSS1, RANGE
    b4c0a:	228b      	movs	r2, #139	; 0x8b
    b4c0c:	2181      	movs	r1, #129	; 0x81
    b4c0e:	4620      	mov	r0, r4
    b4c10:	f7ff fc42 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  writeReg16Bit(DSS_CONFIG__MANUAL_EFFECTIVE_SPADS_SELECT, 200 << 8);
    b4c14:	f44f 4248 	mov.w	r2, #51200	; 0xc800
    b4c18:	2154      	movs	r1, #84	; 0x54
    b4c1a:	4620      	mov	r0, r4
    b4c1c:	f7ff fc58 	bl	b44d0 <_ZN7VL53L1X13writeReg16BitEtt>
-  writeReg(DSS_CONFIG__ROI_MODE_CONTROL, 2); // REQUESTED_EFFFECTIVE_SPADS
    b4c20:	2202      	movs	r2, #2
    b4c22:	214f      	movs	r1, #79	; 0x4f
    b4c24:	4620      	mov	r0, r4
    b4c26:	f7ff fc37 	bl	b4498 <_ZN7VL53L1X8writeRegEth>
-  setDistanceMode(Long);
    b4c2a:	2102      	movs	r1, #2
    b4c2c:	4620      	mov	r0, r4
    b4c2e:	f7ff fed7 	bl	b49e0 <_ZN7VL53L1X15setDistanceModeENS_12DistanceModeE>
-  setMeasurementTimingBudget(50000);
    b4c32:	f24c 3150 	movw	r1, #50000	; 0xc350
    b4c36:	4620      	mov	r0, r4
    b4c38:	f7ff fe54 	bl	b48e4 <_ZN7VL53L1X26setMeasurementTimingBudgetEm>
-    readReg16Bit(MM_CONFIG__OUTER_OFFSET_MM) * 4);
    b4c3c:	2122      	movs	r1, #34	; 0x22
    b4c3e:	4620      	mov	r0, r4
    b4c40:	f7ff fcb4 	bl	b45ac <_ZN7VL53L1X12readReg16BitEt>
-  writeReg16Bit(ALGO__PART_TO_PART_RANGE_OFFSET_MM,
    b4c44:	0080      	lsls	r0, r0, #2
    b4c46:	b282      	uxth	r2, r0
    b4c48:	211e      	movs	r1, #30
    b4c4a:	4620      	mov	r0, r4
    b4c4c:	f7ff fc40 	bl	b44d0 <_ZN7VL53L1X13writeReg16BitEtt>
-  return true;
    b4c50:	2001      	movs	r0, #1
-}
    b4c52:	bd38      	pop	{r3, r4, r5, pc}
-    if (checkTimeoutExpired())
    b4c54:	4620      	mov	r0, r4
    b4c56:	f7ff fc00 	bl	b445a <_ZN7VL53L1X19checkTimeoutExpiredEv>
    b4c5a:	2800      	cmp	r0, #0
    b4c5c:	f43f af58 	beq.w	b4b10 <_ZN7VL53L1X4initEb+0x3e>
-      did_timeout = true;
    b4c60:	2301      	movs	r3, #1
    b4c62:	f884 3020 	strb.w	r3, [r4, #32]
-  if (readReg16Bit(IDENTIFICATION__MODEL_ID) != 0xEACC) { return false; }
    b4c66:	2000      	movs	r0, #0
    b4c68:	e7f3      	b.n	b4c52 <_ZN7VL53L1X4initEb+0x180>
 	...
