@@ -16,7 +16,7 @@
 #include <Wire.h>
 
 void setup();
-void ToF1();
+void ToF();
 void Sleep();
 void loop();
 #line 12 "/Users/friedl/Desktop/Projects/Water_Level_sensor/src/Water_Level_sensor.ino"
@@ -25,6 +25,7 @@ SYSTEM_THREAD(ENABLED);                                 // DANGER!!! //
 
 //--  ST VL53L1CD ToF declarations    --//
 int XSHUT = D2;                                        // To power ToF On/Off
+int LedPin = D3;
 
 char x[] = "Level: ";
 char y[] = "Distance: ";
@@ -37,7 +38,7 @@ int L1_t = 4000, L1_b = 2500;                           // Water Level 1 range i
 int L2_t = 2499, L2_b = 1000;                           // Water Level 2 range in mm
 int L3_t = 999, L3_b = 500;                             // Water Level 3 range in mm
 
-int tof1_level = 0;
+int tof_level = 0;
 
 VL53L1X sensor;
 
@@ -46,8 +47,6 @@ const int numSamples = 100;                           // Number of reading from 
 
 int sensorValue;                                      // The integer value (between 0 and 4095) that we read from the sensor
 
-//--  Other declarations  --//
-
 
 void setup() {
 
@@ -55,11 +54,15 @@ void setup() {
                                
     pinMode(XSHUT, OUTPUT);                                                                          // Set to LOW when using SYSTEM MODE SEMI_AUTOMATIC 
     digitalWrite(XSHUT, LOW);
+    
+    pinMode(LedPin, OUTPUT);
+    digitalWrite(LedPin, LOW);
 }
 
-void ToF1() {
+void ToF() {
     
     digitalWrite(XSHUT, HIGH);                                      // Enable ToF
+    digitalWrite(LedPin, HIGH);                                     // Enable LED
   
     Wire.setClock(400000);                                          // use 400 kHz I2C     
     sensor.init(0x29);
@@ -70,19 +73,19 @@ void ToF1() {
     float accum = 0.0;
     float avgValue = 0.0;
 
-//if (!sensor.init(0x29)) {
-    //     Particle.publish("Could not find a valid ToF1 on bus 0, check wiring!");     //  DEBUG
-    // while (1);                                                                       //  DEBUG
-    // } else { Particle.publish("Tof1 Device OK");                                     //  DEBUG
-//    }
+if (!sensor.init(0x29)) {
+         Particle.publish("Could not find a valid ToF1 on bus 0, check wiring!");     //  DEBUG
+     while (1);                                                                       //  DEBUG
+     } else { Particle.publish("Tof Device OK");                                      //  DEBUG
+    }
 
     sensor.setDistanceMode(VL53L1X::Long);
     sensor.setMeasurementTimingBudget(50000);
-    sensor.startContinuous(50);                                                         // timing budget -- 50ms default
+    sensor.startContinuous(50);                                                       // timing budget -- 50ms default
 
 for (int k=0; k<numSamples; k++) {
         
-        int distance = sensor.read();                                                   //Get the result of the measurement from the sensor
+        int distance = sensor.read();                                                 //Get the result of the measurement from the sensor
         val_prev = float(value_prev);
         val_now = float(distance);
         accum = (val_now + val_prev);
@@ -92,20 +95,20 @@ for (int k=0; k<numSamples; k++) {
     }
 
 if (avgValue <=(L1_t) && avgValue >=(L1_b)) {            
-        tof1_level = 1;                               
+        tof_level = 1;                               
     } else if                                       
         (avgValue <=(L2_t) && avgValue >=(L2_b)) {
-        tof1_level = 2;
+        tof_level = 2;
     } else if                                       
         (avgValue <=(L3_t) && avgValue >=(L3_b)) {
-        tof1_level = 3;
-    } else { tof1_level = 4; 
+        tof_level = 3;
+    } else { tof_level = 4; 
 }
 
     delay(50);
     digitalWrite(XSHUT, LOW);                                      // Disable ToF1 
 
-if (tof1_level != level) {                                          // only send data if Level has shifted
+if (tof_level != level) {                                          // only send data if Level has shifted
     
     if (Particle.connected() == false) {
         WiFi.on();
@@ -116,13 +119,16 @@ if (tof1_level != level) {                                          // only send
         
     if (Particle.connected() == true) {
 
-        Particle.publish("Water Level: " + String(tof1_level), PRIVATE);
+        Particle.publish("Water Level: " + String(tof_level), PRIVATE);
         Particle.publish("Level Distance: " + String(avgValue), PRIVATE);
         }
     }    
     
-    level = tof1_level;
-    delay(50);                     
+    level = tof_level;
+    delay(50);      
+    
+    digitalWrite (LedPin, LOW);
+             
 }
 
 
@@ -137,18 +143,14 @@ void Sleep() {
 
     SystemSleepConfiguration config;
     config.mode(SystemSleepMode::ULTRA_LOW_POWER)
-        .duration(2min);
+        .duration(1min);                                                              // set sleep duration to your preference (in min)                                                        
       
-System.sleep(config);
-
+    System.sleep(config);
 }
 
 
 void loop() {
 
-    ToF1();
-    delay(5000);
-
-    Sleep();                    // After readings system sleeps for 10 minutes
-
+    ToF();
+    Sleep();                                                                          // After readings system sleeps for duration set in Sleep() funtion
 }

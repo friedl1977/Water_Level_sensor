@@ -20,7 +20,7 @@ char x[] = "Level: ";
 char y[] = "Distance: ";
 
 int level = 0;
-int current_level;
+int current_level; 
 int new_level;
 
 int L1_t = 4000, L1_b = 2500;                           // Water Level 1 range in mm
