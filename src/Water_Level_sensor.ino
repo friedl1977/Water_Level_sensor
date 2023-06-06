@@ -117,7 +117,7 @@ if (tof_level != level) {                                          // only send 
     delay(50);      
     
     digitalWrite (LedPin, LOW);
-    Sleep();                
+             
 }
 
 
@@ -141,7 +141,5 @@ void Sleep() {
 void loop() {
 
     ToF();
-    delay(5000);
-
-  //  Sleep();                                                                          // After readings system sleeps for duration set in Sleep() funtion
+    Sleep();                                                                          // After readings system sleeps for duration set in Sleep() funtion
 }
